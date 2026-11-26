@@ -1,0 +1,32 @@
+<section class="products">
+  <h2>{{ heading_title }}</h2>
+  <div class="grid">
+    {% for product in products %}
+    <article class="card">
+      <a class="card-media" href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" /></a>
+      <div class="card-body">
+        <h3><a href="{{ product.href }}">{{ product.name }}</a></h3>
+        {% if product.description %}<p>{{ product.description }}</p>{% endif %}
+        {% if product.rating %}
+        <div class="stars">
+          {% for i in 1..5 %}
+          <span class="{% if product.rating < i %}is-off{% endif %}">★</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if product.price %}
+        <p class="card-price">
+          {% if not product.special %}
+          {{ product.price }}
+          {% else %}
+          <span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span>
+          {% endif %}
+          {% if product.tax %}<span class="price-tax">{{ text_tax }} {{ product.tax }}</span>{% endif %}
+        </p>
+        {% endif %}
+        <button type="button" class="btn" onclick="cart.add('{{ product.product_id }}'{% if product.minimum %}, '{{ product.minimum }}'{% endif %});">{{ button_cart }}</button>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>

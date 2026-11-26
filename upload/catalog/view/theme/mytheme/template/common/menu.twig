@@ -1,0 +1,22 @@
+{% if categories %}
+<nav class="nav" id="menu">
+  <div class="shell">
+    <button type="button" class="nav-toggle" id="menu-toggle" aria-expanded="false">{{ text_category }}</button>
+    <ul class="nav-list">
+      {% for category in categories %}
+      <li>
+        <a href="{{ category.href }}">{{ category.name }}</a>
+        {% if category.children %}
+        <ul>
+          {% for child in category.children %}
+          <li><a href="{{ child.href }}">{{ child.name }}</a></li>
+          {% endfor %}
+          <li><a href="{{ category.href }}">{{ text_all }} {{ category.name }}</a></li>
+        </ul>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</nav>
+{% endif %}

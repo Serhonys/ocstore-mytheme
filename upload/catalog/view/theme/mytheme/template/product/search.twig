@@ -1,0 +1,72 @@
+{{ header }}
+<main class="layout" id="product-search">
+  {{ column_left }}
+  <div id="content" class="layout-main">
+    <ul class="crumbs">
+      {% for breadcrumb in breadcrumbs %}
+      <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+      {% endfor %}
+    </ul>
+    {{ content_top }}
+    <h1>{{ heading_title }}</h1>
+    <div class="side-block">
+      <label>{{ entry_search }}
+        <input type="text" name="search" value="{{ search }}" id="input-search" />
+      </label>
+      <label class="checkbox"><input type="checkbox" name="description" value="1" id="description"{% if description %} checked="checked"{% endif %} /> {{ entry_description }}</label>
+      <label>{{ text_category }}
+        <select name="category_id">
+          <option value="0">{{ text_category }}</option>
+          {% for category_1 in categories %}
+          <option value="{{ category_1.category_id }}"{% if category_1.category_id == category_id %} selected="selected"{% endif %}>{{ category_1.name }}</option>
+          {% for category_2 in category_1.children %}
+          <option value="{{ category_2.category_id }}"{% if category_2.category_id == category_id %} selected="selected"{% endif %}>&nbsp;&nbsp;{{ category_2.name }}</option>
+          {% for category_3 in category_2.children %}
+          <option value="{{ category_3.category_id }}"{% if category_3.category_id == category_id %} selected="selected"{% endif %}>&nbsp;&nbsp;&nbsp;&nbsp;{{ category_3.name }}</option>
+          {% endfor %}
+          {% endfor %}
+          {% endfor %}
+        </select>
+      </label>
+      <label class="checkbox"><input type="checkbox" name="sub_category" value="1"{% if sub_category %} checked="checked"{% endif %} /> {{ text_sub_category }}</label>
+      <button type="button" id="button-search" class="btn">{{ button_search }}</button>
+    </div>
+    {% if products %}
+    <div class="grid">
+      {% for product in products %}
+      <article class="card">
+        <a class="card-media" href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" /></a>
+        <div class="card-body">
+          <h3><a href="{{ product.href }}">{{ product.name }}</a></h3>
+          {% if product.price %}
+          <p class="card-price">{% if not product.special %}{{ product.price }}{% else %}<span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span>{% endif %}</p>
+          {% endif %}
+          <button type="button" class="btn" onclick="cart.add('{{ product.product_id }}', '{{ product.minimum }}');">{{ button_cart }}</button>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    <div class="toolbar"><div>{{ pagination }}</div><div>{{ results }}</div></div>
+    {% else %}
+    <p class="empty">{{ text_empty }}</p>
+    {% endif %}
+    {{ content_bottom }}
+  </div>
+  {{ column_right }}
+</main>
+<script>
+$('#button-search').on('click', function () {
+  var url = 'index.php?route=product/search';
+  var search = $('#content input[name=\'search\']').val();
+  if (search) { url += '&search=' + encodeURIComponent(search); }
+  var category_id = $('#content select[name=\'category_id\']').val();
+  if (category_id > 0) { url += '&category_id=' + encodeURIComponent(category_id); }
+  if ($('#content input[name=\'sub_category\']:checked').length) { url += '&sub_category=true'; }
+  if ($('#content input[name=\'description\']:checked').length) { url += '&description=true'; }
+  location = url;
+});
+$('#content input[name=\'search\']').on('keydown', function (e) {
+  if (e.keyCode == 13) { $('#button-search').trigger('click'); }
+});
+</script>
+{{ footer }}

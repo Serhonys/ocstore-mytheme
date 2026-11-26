@@ -1,0 +1,9 @@
+{% if languages|length > 1 %}
+<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-language" class="switchers">
+  {% for language in languages %}
+  <button class="language-select{% if language.code == code %} is-current{% endif %}" type="button" name="{{ language.code }}">{{ language.name }}</button>
+  {% endfor %}
+  <input type="hidden" name="code" value="" />
+  <input type="hidden" name="redirect" value="{{ redirect }}" />
+</form>
+{% endif %}

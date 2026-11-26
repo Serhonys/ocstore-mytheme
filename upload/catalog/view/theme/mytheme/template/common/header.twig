@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="{{ lang }}">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+<base href="{{ base }}" />
+{% if description %}
+<meta name="description" content="{{ description }}" />
+{% endif %}
+{% if keywords %}
+<meta name="keywords" content="{{ keywords }}" />
+{% endif %}
+{% set body_font = font_body|default('Manrope') %}
+{% set head_font = font_heading|default('Fraunces') %}
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family={{ body_font|replace({' ': '+'}) }}:wght@400;500;600;700&family={{ head_font|replace({' ': '+'}) }}:wght@500;600;700&display=swap" rel="stylesheet" />
+<script src="catalog/view/javascript/jquery/jquery-2.1.1.min.js"></script>
+<script src="catalog/view/javascript/bootstrap/js/bootstrap.min.js"></script>
+<link href="catalog/view/javascript/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+<link href="catalog/view/theme/mytheme/stylesheet/stylesheet.css" rel="stylesheet" />
+<style>
+:root {
+  --c-bg: {{ color_bg|default('#f4f1ec') }};
+  --c-text: {{ color_text|default('#1c1917') }};
+  --c-primary: {{ color_primary|default('#9a3412') }};
+  --c-card: {{ color_card|default('#fffcf8') }};
+  --font-body: "{{ body_font }}", sans-serif;
+  --font-heading: "{{ head_font }}", serif;
+}
+</style>
+{% for style in styles %}
+<link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" />
+{% endfor %}
+{% for script in scripts %}
+<script src="{{ script }}"></script>
+{% endfor %}
+<script src="catalog/view/javascript/common.js"></script>
+<script src="catalog/view/theme/mytheme/javascript/theme.js"></script>
+{% for link in links %}
+<link href="{{ link.href }}" rel="{{ link.rel }}" />
+{% endfor %}
+{% for analytic in analytics %}
+{{ analytic }}
+{% endfor %}
+</head>
+<body>
+<div class="shell topbar">
+  <div class="switchers">{{ currency }}{{ language }}</div>
+  <div class="topbar-links">
+    {% if telephone %}<a href="tel:{{ telephone|replace({' ': ''}) }}">{{ telephone }}</a>{% endif %}
+    <div class="account">
+      <button type="button" id="account-toggle">{{ text_account }}</button>
+      <div class="account-menu">
+        {% if logged %}
+        <a href="{{ account }}">{{ text_account }}</a>
+        <a href="{{ order }}">{{ text_order }}</a>
+        <a href="{{ transaction }}">{{ text_transaction }}</a>
+        <a href="{{ download }}">{{ text_download }}</a>
+        <a href="{{ logout }}">{{ text_logout }}</a>
+        {% else %}
+        <a href="{{ register }}">{{ text_register }}</a>
+        <a href="{{ login }}">{{ text_login }}</a>
+        {% endif %}
+        <a href="{{ wishlist }}" id="wishlist-total">{{ text_wishlist }}</a>
+        <a href="{{ shopping_cart }}">{{ text_shopping_cart }}</a>
+        <a href="{{ checkout }}">{{ text_checkout }}</a>
+      </div>
+    </div>
+  </div>
+</div>
+<header class="shell header">
+  <div class="logo">
+    {% if logo %}
+    <a href="{{ home }}"><img src="{{ logo }}" title="{{ name }}" alt="{{ name }}" /></a>
+    {% else %}
+    <a href="{{ home }}">{{ name }}</a>
+    {% endif %}
+    {% if tagline %}<p class="tagline">{{ tagline }}</p>{% endif %}
+  </div>
+  {{ search }}
+  {{ cart }}
+</header>
+{{ menu }}

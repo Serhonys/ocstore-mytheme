@@ -1,0 +1,13 @@
+{% if reviews %}
+{% for review in reviews %}
+<article>
+  <strong>{{ review.author }}</strong>
+  <span>{{ review.date_added }}</span>
+  <div class="stars">{% for i in 1..5 %}<span class="{% if review.rating < i %}is-off{% endif %}">★</span>{% endfor %}</div>
+  <p>{{ review.text }}</p>
+</article>
+{% endfor %}
+<div>{{ pagination }}</div>
+{% else %}
+<p>{{ text_no_reviews }}</p>
+{% endif %}

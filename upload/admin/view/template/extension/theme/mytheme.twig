@@ -1,0 +1,171 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-theme" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-theme" class="form-horizontal">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-look" data-toggle="tab">{{ text_look }}</a></li>
+            <li><a href="#tab-general" data-toggle="tab">{{ text_general }}</a></li>
+            <li><a href="#tab-image" data-toggle="tab">{{ text_image }}</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-look">
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ text_store|default('Магазин') }}</label>
+                <div class="col-sm-10">
+                  <select class="form-control" onchange="location = this.value;">
+                    {% for store in stores %}
+                    <option value="{{ store.href }}"{% if store.store_id == store_id %} selected="selected"{% endif %}>{{ store.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                <div class="col-sm-10">
+                  <select name="theme_mytheme_status" id="input-status" class="form-control">
+                    {% if theme_mytheme_status %}
+                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                    <option value="0">{{ text_disabled }}</option>
+                    {% else %}
+                    <option value="1">{{ text_enabled }}</option>
+                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-color-bg">{{ entry_color_bg }}</label>
+                <div class="col-sm-10">
+                  <input type="color" name="theme_mytheme_color_bg" value="{{ theme_mytheme_color_bg }}" id="input-color-bg" class="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-color-text">{{ entry_color_text }}</label>
+                <div class="col-sm-10">
+                  <input type="color" name="theme_mytheme_color_text" value="{{ theme_mytheme_color_text }}" id="input-color-text" class="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-color-primary">{{ entry_color_primary }}</label>
+                <div class="col-sm-10">
+                  <input type="color" name="theme_mytheme_color_primary" value="{{ theme_mytheme_color_primary }}" id="input-color-primary" class="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-color-card">{{ entry_color_card }}</label>
+                <div class="col-sm-10">
+                  <input type="color" name="theme_mytheme_color_card" value="{{ theme_mytheme_color_card }}" id="input-color-card" class="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-font-body">{{ entry_font_body }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="theme_mytheme_font_body" value="{{ theme_mytheme_font_body }}" id="input-font-body" class="form-control" />
+                  <p class="help-block">{{ help_font }}</p>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-font-heading">{{ entry_font_heading }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="theme_mytheme_font_heading" value="{{ theme_mytheme_font_heading }}" id="input-font-heading" class="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-phone">{{ entry_phone }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="theme_mytheme_phone" value="{{ theme_mytheme_phone }}" id="input-phone" class="form-control" />
+                  <p class="help-block">{{ help_phone }}</p>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-tagline">{{ entry_tagline }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="theme_mytheme_tagline" value="{{ theme_mytheme_tagline }}" id="input-tagline" class="form-control" />
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="tab-general">
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-product-limit">{{ entry_product_limit }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="theme_mytheme_product_limit" value="{{ theme_mytheme_product_limit }}" id="input-product-limit" class="form-control" />
+                  {% if error_product_limit %}
+                  <div class="text-danger">{{ error_product_limit }}</div>
+                  {% endif %}
+                  <p class="help-block">{{ help_product_limit }}</p>
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-description-length">{{ entry_product_description_length }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="theme_mytheme_product_description_length" value="{{ theme_mytheme_product_description_length }}" id="input-description-length" class="form-control" />
+                  {% if error_product_description_length %}
+                  <div class="text-danger">{{ error_product_description_length }}</div>
+                  {% endif %}
+                  <p class="help-block">{{ help_product_description_length }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="tab-image">
+              {% set rows = [
+                ['category', entry_image_category, theme_mytheme_image_category_width, theme_mytheme_image_category_height, error_image_category],
+                ['thumb', entry_image_thumb, theme_mytheme_image_thumb_width, theme_mytheme_image_thumb_height, error_image_thumb],
+                ['popup', entry_image_popup, theme_mytheme_image_popup_width, theme_mytheme_image_popup_height, error_image_popup],
+                ['product', entry_image_product, theme_mytheme_image_product_width, theme_mytheme_image_product_height, error_image_product],
+                ['additional', entry_image_additional, theme_mytheme_image_additional_width, theme_mytheme_image_additional_height, error_image_additional],
+                ['related', entry_image_related, theme_mytheme_image_related_width, theme_mytheme_image_related_height, error_image_related],
+                ['compare', entry_image_compare, theme_mytheme_image_compare_width, theme_mytheme_image_compare_height, error_image_compare],
+                ['wishlist', entry_image_wishlist, theme_mytheme_image_wishlist_width, theme_mytheme_image_wishlist_height, error_image_wishlist],
+                ['cart', entry_image_cart, theme_mytheme_image_cart_width, theme_mytheme_image_cart_height, error_image_cart],
+                ['location', entry_image_location, theme_mytheme_image_location_width, theme_mytheme_image_location_height, error_image_location]
+              ] %}
+              {% for row in rows %}
+              <div class="form-group required">
+                <label class="col-sm-2 control-label">{{ row[1] }}</label>
+                <div class="col-sm-10">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <input type="text" name="theme_mytheme_image_{{ row[0] }}_width" value="{{ row[2] }}" class="form-control" />
+                    </div>
+                    <div class="col-sm-6">
+                      <input type="text" name="theme_mytheme_image_{{ row[0] }}_height" value="{{ row[3] }}" class="form-control" />
+                    </div>
+                  </div>
+                  {% if row[4] %}
+                  <div class="text-danger">{{ row[4] }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

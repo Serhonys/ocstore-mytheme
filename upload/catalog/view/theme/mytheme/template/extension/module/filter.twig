@@ -1,0 +1,24 @@
+<div class="side-block">
+  <h3>{{ heading_title }}</h3>
+  {% for filter_group in filter_groups %}
+  <p><strong>{{ filter_group.name }}</strong></p>
+  <div id="filter-group{{ filter_group.filter_group_id }}">
+    {% for filter in filter_group.filter %}
+    <label class="checkbox">
+      <input type="checkbox" name="filter[]" value="{{ filter.filter_id }}"{% if filter.filter_id in filter_category %} checked="checked"{% endif %} />
+      {{ filter.name }}
+    </label>
+    {% endfor %}
+  </div>
+  {% endfor %}
+  <button type="button" id="button-filter" class="btn">{{ button_filter }}</button>
+</div>
+<script>
+$('#button-filter').on('click', function () {
+  var filter = [];
+  $('input[name^=\'filter\']:checked').each(function () {
+    filter.push(this.value);
+  });
+  location = '{{ action }}&filter=' + filter.join(',');
+});
+</script>

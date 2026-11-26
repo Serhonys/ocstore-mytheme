@@ -87,12 +87,16 @@ class ControllerExtensionThemeMytheme extends Controller {
 			'theme_mytheme_image_cart_height'          => 80,
 			'theme_mytheme_image_location_width'       => 268,
 			'theme_mytheme_image_location_height'      => 80,
-			'theme_mytheme_color_bg'                   => '#f4f1ec',
-			'theme_mytheme_color_text'                 => '#1c1917',
-			'theme_mytheme_color_primary'              => '#9a3412',
-			'theme_mytheme_color_card'                 => '#fffcf8',
-			'theme_mytheme_font_body'                  => 'Manrope',
-			'theme_mytheme_font_heading'               => 'Fraunces',
+			'theme_mytheme_color_bg'                   => '#FAFAFA',
+			'theme_mytheme_color_text'                 => '#111111',
+			'theme_mytheme_color_primary'              => '#111111',
+			'theme_mytheme_color_card'                 => '#FFFFFF',
+			'theme_mytheme_color_line'                 => '#E5E5E5',
+			'theme_mytheme_color_sale'                 => '#DC2626',
+			'theme_mytheme_color_ok'                   => '#16A34A',
+			'theme_mytheme_radius'                     => 14,
+			'theme_mytheme_font_body'                  => 'Inter',
+			'theme_mytheme_font_heading'               => 'Plus Jakarta Sans',
 			'theme_mytheme_phone'                      => '',
 			'theme_mytheme_tagline'                    => ''
 		);
@@ -172,13 +176,20 @@ class ControllerExtensionThemeMytheme extends Controller {
 			'theme_mytheme_color_bg',
 			'theme_mytheme_color_text',
 			'theme_mytheme_color_primary',
-			'theme_mytheme_color_card'
+			'theme_mytheme_color_card',
+			'theme_mytheme_color_line',
+			'theme_mytheme_color_sale',
+			'theme_mytheme_color_ok'
 		);
 
 		foreach ($colors as $color) {
 			if (empty($this->request->post[$color]) || !preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $this->request->post[$color])) {
 				$this->error['warning'] = $this->language->get('error_color');
 			}
+		}
+
+		if (!isset($this->request->post['theme_mytheme_radius']) || $this->request->post['theme_mytheme_radius'] === '' || !is_numeric($this->request->post['theme_mytheme_radius'])) {
+			$this->error['warning'] = $this->language->get('error_radius');
 		}
 
 		foreach (array('theme_mytheme_font_body', 'theme_mytheme_font_heading') as $font) {

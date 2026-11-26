@@ -1,7 +1,8 @@
-<div id="cart" class="cart">
-  <button type="button" data-toggle="dropdown" data-loading-text="{{ text_loading }}">{{ text_items }}</button>
+<div id="cart">
+  <button type="button" class="pill" data-toggle="dropdown" data-loading-text="{{ text_loading }}">{{ text_cart }} <span class="badge" id="cart-total">{{ text_items }}</span></button>
   <ul class="dropdown-menu">
     {% if products or vouchers %}
+    <li style="padding:18px 18px 8px;font-family:var(--font-heading);font-weight:700;">{{ text_cart }}</li>
     <li>
       <table>
         {% for product in products %}
@@ -9,23 +10,18 @@
           <td>{% if product.thumb %}<a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" /></a>{% endif %}</td>
           <td>
             <a href="{{ product.href }}">{{ product.name }}</a>
-            {% if product.option %}
-            {% for option in product.option %}<br><small>{{ option.name }} {{ option.value }}</small>{% endfor %}
-            {% endif %}
+            {% if product.option %}{% for option in product.option %}<br><small>{{ option.name }} {{ option.value }}</small>{% endfor %}{% endif %}
             {% if product.recurring %}<br><small>{{ text_recurring }} {{ product.recurring }}</small>{% endif %}
+            <div class="mono">x {{ product.quantity }} · {{ product.total }}</div>
           </td>
-          <td>x {{ product.quantity }}</td>
-          <td>{{ product.total }}</td>
-          <td><button type="button" onclick="cart.remove('{{ product.cart_id }}');" title="{{ button_remove }}">&times;</button></td>
+          <td><button type="button" class="btn btn-ghost" onclick="cart.remove('{{ product.cart_id }}');">{{ button_remove }}</button></td>
         </tr>
         {% endfor %}
         {% for voucher in vouchers %}
         <tr>
           <td></td>
-          <td>{{ voucher.description }}</td>
-          <td>x 1</td>
-          <td>{{ voucher.amount }}</td>
-          <td><button type="button" onclick="voucher.remove('{{ voucher.key }}');" title="{{ button_remove }}">&times;</button></td>
+          <td>{{ voucher.description }}<div class="mono">{{ voucher.amount }}</div></td>
+          <td><button type="button" class="btn btn-ghost" onclick="voucher.remove('{{ voucher.key }}');">{{ button_remove }}</button></td>
         </tr>
         {% endfor %}
       </table>
@@ -33,16 +29,13 @@
     <li>
       <table>
         {% for total in totals %}
-        <tr>
-          <td><strong>{{ total.title }}</strong></td>
-          <td>{{ total.text }}</td>
-        </tr>
+        <tr><td><strong>{{ total.title }}</strong></td><td class="mono">{{ total.text }}</td></tr>
         {% endfor %}
       </table>
       <p class="actions"><a class="btn btn-ghost" href="{{ cart }}">{{ text_cart }}</a><a class="btn" href="{{ checkout }}">{{ text_checkout }}</a></p>
     </li>
     {% else %}
-    <li><p>{{ text_empty }}</p></li>
+    <li><p style="padding:28px 18px;">{{ text_empty }}</p></li>
     {% endif %}
   </ul>
 </div>

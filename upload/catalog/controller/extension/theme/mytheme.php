@@ -1,12 +1,16 @@
 <?php
 class ControllerExtensionThemeMytheme extends Controller {
 	public function headerBefore(&$route, &$data, &$code) {
-		$data['color_bg'] = $this->color('theme_mytheme_color_bg', '#f4f1ec');
-		$data['color_text'] = $this->color('theme_mytheme_color_text', '#1c1917');
-		$data['color_primary'] = $this->color('theme_mytheme_color_primary', '#9a3412');
-		$data['color_card'] = $this->color('theme_mytheme_color_card', '#fffcf8');
-		$data['font_body'] = $this->font('theme_mytheme_font_body', 'Manrope');
-		$data['font_heading'] = $this->font('theme_mytheme_font_heading', 'Fraunces');
+		$data['color_bg'] = $this->color('theme_mytheme_color_bg', '#FAFAFA');
+		$data['color_text'] = $this->color('theme_mytheme_color_text', '#111111');
+		$data['color_primary'] = $this->color('theme_mytheme_color_primary', '#111111');
+		$data['color_card'] = $this->color('theme_mytheme_color_card', '#FFFFFF');
+		$data['color_line'] = $this->color('theme_mytheme_color_line', '#E5E5E5');
+		$data['color_sale'] = $this->color('theme_mytheme_color_sale', '#DC2626');
+		$data['color_ok'] = $this->color('theme_mytheme_color_ok', '#16A34A');
+		$data['font_body'] = $this->font('theme_mytheme_font_body', 'Inter');
+		$data['font_heading'] = $this->font('theme_mytheme_font_heading', 'Plus Jakarta Sans');
+		$data['radius'] = $this->radius('theme_mytheme_radius', 14);
 		$data['tagline'] = trim(strip_tags((string)$this->config->get('theme_mytheme_tagline')));
 
 		$phone = trim(strip_tags((string)$this->config->get('theme_mytheme_phone')));
@@ -26,6 +30,21 @@ class ControllerExtensionThemeMytheme extends Controller {
 		return $fallback;
 	}
 
+	private function radius($key, $fallback) {
+		$value = $this->config->get($key);
+
+		if ($value === null || $value === '' || !is_numeric($value)) {
+			return $fallback;
+		}
+
+		$value = (int)$value;
+
+		if ($value < 0 || $value > 32) {
+			return $fallback;
+		}
+
+		return $value;
+	}
 	private function font($key, $fallback) {
 		$value = trim((string)$this->config->get($key));
 

@@ -207,6 +207,7 @@ class ControllerExtensionThemeMytheme extends Controller {
 		$this->model_setting_event->deleteEventByCode('mytheme');
 
 		$this->model_setting_event->addEvent('mytheme', 'catalog/view/common/header/before', 'extension/theme/mytheme/headerBefore', 1, 0);
+		$this->model_setting_event->addEvent('mytheme', 'catalog/view/product/product/before', 'extension/theme/mytheme/productBefore', 1, 0);
 	}
 
 	public function uninstall() {

@@ -1,326 +1,2250 @@
-{{ header }}
-<main class="layout" id="product-product">
-  {{ column_left }}
-  <div id="content" class="layout-main">
-    <ul class="crumbs breadcrumb">
-      {% for breadcrumb in breadcrumbs %}
-      <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
-      {% endfor %}
-    </ul>
-    {{ content_top }}
-    <div class="nf-product">
-      <div>
-        {% if thumb or images %}
-        <ul class="thumbnails">
-          {% if thumb %}
-          <li><a href="{{ popup }}" title="{{ heading_title }}"><img src="{{ thumb }}" alt="{{ heading_title }}" /></a></li>
-          {% endif %}
-          {% if images %}
-          {% for image in images %}
-          <li class="image-additional"><a href="{{ image.popup }}" title="{{ heading_title }}"><img src="{{ image.thumb }}" alt="{{ heading_title }}" /></a></li>
-          {% endfor %}
-          {% endif %}
-        </ul>
-        {% endif %}
-        <div class="tabs">
-          <ul class="tab-nav">
-            <li class="is-active"><a href="#tab-description">{{ tab_description }}</a></li>
-            {% if attribute_groups %}<li><a href="#tab-specification">{{ tab_attribute }}</a></li>{% endif %}
-            {% if review_status %}<li><a href="#tab-review">{{ tab_review }}</a></li>{% endif %}
-          </ul>
-          <div class="tab-pane is-active" id="tab-description">{{ description }}</div>
-          {% if attribute_groups %}
-          <div class="tab-pane" id="tab-specification">
-            <table class="table">
-              {% for attribute_group in attribute_groups %}
-              <tr><td colspan="2"><strong>{{ attribute_group.name }}</strong></td></tr>
-              {% for attribute in attribute_group.attribute %}
-              <tr><td>{{ attribute.name }}</td><td>{{ attribute.text }}</td></tr>
-              {% endfor %}
-              {% endfor %}
-            </table>
-          </div>
-          {% endif %}
-          {% if review_status %}
-          <div class="tab-pane" id="tab-review">
-            <form id="form-review">
-              <div id="review"></div>
-              <h2>{{ text_write }}</h2>
-              {% if review_guest %}
-              <div class="field"><label for="input-name">{{ entry_name }}</label><input type="text" name="name" value="{{ customer_name }}" id="input-name" /></div>
-              <div class="field"><label for="input-review">{{ entry_review }}</label><textarea name="text" rows="5" id="input-review"></textarea><p>{{ text_note }}</p></div>
-              <div class="field">
-                {{ entry_rating }} {{ entry_bad }}
-                <input type="radio" name="rating" value="1" />
-                <input type="radio" name="rating" value="2" />
-                <input type="radio" name="rating" value="3" />
-                <input type="radio" name="rating" value="4" />
-                <input type="radio" name="rating" value="5" />
-                {{ entry_good }}
-              </div>
-              {{ captcha }}
-              <button type="button" id="button-review" data-loading-text="{{ text_loading }}" class="btn">{{ button_continue }}</button>
-              {% else %}{{ text_login }}{% endif %}
-            </form>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-      <aside class="nf-buy">
-        <div class="sku">
-          <span class="mono">{{ text_model }} {{ model }}</span>
-          <span class="stock-ok">{{ text_stock }} {{ stock }}</span>
-        </div>
-        <h1>{{ heading_title }}</h1>
-        <ul class="meta">
-          {% if manufacturer %}<li>{{ text_manufacturer }} <a href="{{ manufacturers }}">{{ manufacturer }}</a></li>{% endif %}
-          {% if reward %}<li>{{ text_reward }} {{ reward }}</li>{% endif %}
-        </ul>
-        {% if price %}
-        <div class="price-lg">
-          {% if not special %}{{ price }}{% else %}<span class="price-old">{{ price }}</span> {{ special }}{% endif %}
-        </div>
-        {% if tax %}<p class="meta">{{ text_tax }} {{ tax }}</p>{% endif %}
-        {% if points %}<p class="meta">{{ text_points }} {{ points }}</p>{% endif %}
-        {% if discounts %}
-        <ul class="meta">{% for discount in discounts %}<li>{{ discount.quantity }}{{ text_discount }}{{ discount.price }}</li>{% endfor %}</ul>
-        {% endif %}
-        {% endif %}
-        <div id="product">
-          {% if options %}
-          <h2 style="font-size:14px;">{{ text_option }}</h2>
-          {% for option in options %}
-          {% if option.type == 'select' %}
-          <div class="field{% if option.required %} required{% endif %}">
-            <label for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
-            <select name="option[{{ option.product_option_id }}]" id="input-option{{ option.product_option_id }}">
-              <option value="">{{ text_select }}</option>
-              {% for option_value in option.product_option_value %}
-              <option value="{{ option_value.product_option_value_id }}">{{ option_value.name }}{% if option_value.price %} ({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}</option>
-              {% endfor %}
-            </select>
-          </div>
-          {% endif %}
-          {% if option.type == 'radio' %}
-          <div class="field{% if option.required %} required{% endif %}">
-            <label>{{ option.name }}</label>
-            <div id="input-option{{ option.product_option_id }}">
-              {% for option_value in option.product_option_value %}
-              <label class="nf-choice">
-                <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" />
-                {% if option_value.image %}<img src="{{ option_value.image }}" alt="" style="width:28px;height:28px;object-fit:cover;border-radius:999px;" />{% endif %}
-                <span>{{ option_value.name }}{% if option_value.price %} <span class="mono">{{ option_value.price_prefix }}{{ option_value.price }}</span>{% endif %}</span>
-              </label>
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
-          {% if option.type == 'checkbox' %}
-          <div class="field{% if option.required %} required{% endif %}">
-            <label>{{ option.name }}</label>
-            <div id="input-option{{ option.product_option_id }}">
-              {% for option_value in option.product_option_value %}
-              <label class="nf-choice">
-                <input type="checkbox" name="option[{{ option.product_option_id }}][]" value="{{ option_value.product_option_value_id }}" />
-                <span>{{ option_value.name }}{% if option_value.price %} <span class="mono">{{ option_value.price_prefix }}{{ option_value.price }}</span>{% endif %}</span>
-              </label>
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
-          {% if option.type == 'text' %}
-          <div class="field{% if option.required %} required{% endif %}">
-            <label for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
-            <input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" id="input-option{{ option.product_option_id }}" />
-          </div>
-          {% endif %}
-          {% if option.type == 'textarea' %}
-          <div class="field{% if option.required %} required{% endif %}">
-            <label for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
-            <textarea name="option[{{ option.product_option_id }}]" id="input-option{{ option.product_option_id }}" rows="4">{{ option.value }}</textarea>
-          </div>
-          {% endif %}
-          {% if option.type == 'file' %}
-          <div class="field{% if option.required %} required{% endif %}">
-            <label>{{ option.name }}</label>
-            <button type="button" id="button-upload{{ option.product_option_id }}" data-loading-text="{{ text_loading }}" class="btn btn-ghost">{{ button_upload }}</button>
-            <input type="hidden" name="option[{{ option.product_option_id }}]" value="" id="input-option{{ option.product_option_id }}" />
-          </div>
-          {% endif %}
-          {% if option.type == 'date' %}
-          <div class="field{% if option.required %} required{% endif %}">
-            <label for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
-            <div class="date"><input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" data-date-format="YYYY-MM-DD" id="input-option{{ option.product_option_id }}" /></div>
-          </div>
-          {% endif %}
-          {% if option.type == 'datetime' %}
-          <div class="field{% if option.required %} required{% endif %}">
-            <label for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
-            <div class="datetime"><input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" data-date-format="YYYY-MM-DD HH:mm" id="input-option{{ option.product_option_id }}" /></div>
-          </div>
-          {% endif %}
-          {% if option.type == 'time' %}
-          <div class="field{% if option.required %} required{% endif %}">
-            <label for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
-            <div class="time"><input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" data-date-format="HH:mm" id="input-option{{ option.product_option_id }}" /></div>
-          </div>
-          {% endif %}
-          {% endfor %}
-          {% endif %}
-          {% if recurrings %}
-          <div class="field required">
-            <label>{{ text_payment_recurring }}</label>
-            <select name="recurring_id">
-              <option value="">{{ text_select }}</option>
-              {% for recurring in recurrings %}<option value="{{ recurring.recurring_id }}">{{ recurring.name }}</option>{% endfor %}
-            </select>
-            <div id="recurring-description"></div>
-          </div>
-          {% endif %}
-          <div class="field">
-            <label for="input-quantity">{{ entry_qty }}</label>
-            <div class="qty-row">
-              <input type="text" name="quantity" value="{{ minimum }}" id="input-quantity" />
-              <input type="hidden" name="product_id" value="{{ product_id }}" />
-            </div>
-          </div>
-          <button type="button" id="button-cart" data-loading-text="{{ text_loading }}" class="btn">{{ button_cart }}</button>
-          <p class="actions">
-            <button type="button" class="btn btn-ghost" onclick="wishlist.add('{{ product_id }}');">{{ button_wishlist }}</button>
-            <button type="button" class="btn btn-ghost" onclick="compare.add('{{ product_id }}');">{{ button_compare }}</button>
-          </p>
-          {% if minimum > 1 %}<div class="alert alert-info">{{ text_minimum }}</div>{% endif %}
-          {% if review_status %}<p class="meta"><a href="#tab-review">{{ reviews }}</a> · <a href="#tab-review">{{ text_write }}</a></p>{% endif %}
-        </div>
-      </aside>
-    </div>
-    {% if products %}
-    <h2>{{ text_related }}</h2>
-    <div class="grid">
-      {% for product in products %}
-      <article class="card">
-        <a class="card-media" href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" /></a>
-        <div class="card-body">
-          <h3><a href="{{ product.href }}">{{ product.name }}</a></h3>
-          {% if product.price %}<p class="card-price">{% if not product.special %}{{ product.price }}{% else %}<span class="price-new">{{ product.special }}</span> <span class="price-old">{{ product.price }}</span>{% endif %}</p>{% endif %}
-          <button type="button" class="btn" onclick="cart.add('{{ product.product_id }}', '{{ product.minimum }}');">{{ button_cart }}</button>
-        </div>
-      </article>
-      {% endfor %}
-    </div>
-    {% endif %}
-    {% if tags %}
-    <p>{{ text_tags }}
-      {% for i in 0..tags|length - 1 %}
-      {% if i < (tags|length - 1) %}<a href="{{ tags[i].href }}">{{ tags[i].tag }}</a>, {% else %}<a href="{{ tags[i].href }}">{{ tags[i].tag }}</a>{% endif %}
-      {% endfor %}
-    </p>
-    {% endif %}
-    {{ content_bottom }}
-  </div>
-  {{ column_right }}
-</main>
-<script>
-$('select[name=\'recurring_id\'], input[name="quantity"]').change(function(){
-  $.ajax({
-    url: 'index.php?route=product/product/getRecurringDescription',
-    type: 'post',
-    data: $('input[name=\'product_id\'], input[name=\'quantity\'], select[name=\'recurring_id\']'),
-    dataType: 'json',
-    success: function(json) { if (json['success']) { $('#recurring-description').html(json['success']); } }
-  });
-});
-$('#button-cart').on('click', function() {
-  $.ajax({
-    url: 'index.php?route=checkout/cart/add',
-    type: 'post',
-    data: $('#product input[type=\'text\'], #product input[type=\'hidden\'], #product input[type=\'radio\']:checked, #product input[type=\'checkbox\']:checked, #product select, #product textarea'),
-    dataType: 'json',
-    beforeSend: function() { $('#button-cart').button('loading'); },
-    complete: function() { $('#button-cart').button('reset'); },
-    success: function(json) {
-      $('.alert-dismissible, .text-danger').remove();
-      if (json['error']) {
-        if (json['error']['option']) {
-          for (i in json['error']['option']) {
-            $('#input-option' + i.replace('_', '-')).after('<div class="text-danger">' + json['error']['option'][i] + '</div>');
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <base href="{{ base ?: '/' }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title ?: heading_title }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            canvas: '#FAFAFA',
+            surface: '#FFFFFF',
+            hairline: '#E5E5E5',
+            ink: '#111111',
+            crimson: '#DC2626',
+            forest: '#16A34A',
           }
         }
-        if (json['error']['recurring']) {
-          $('select[name=\'recurring_id\']').after('<div class="text-danger">' + json['error']['recurring'] + '</div>');
-        }
-      }
-      if (json['success']) {
-        $('.breadcrumb').after('<div class="alert alert-success alert-dismissible">' + json['success'] + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
-        $('#cart > button').html('<span class="badge" id="cart-total">' + json['total'] + '</span>');
-        $('html, body').animate({ scrollTop: 0 }, 'slow');
-        $('#cart > ul').load('index.php?route=common/cart/info ul li');
       }
     }
-  });
-});
-$(document).on('click', 'a[href="#tab-review"]', function (e) {
-  e.preventDefault();
-  $('.tab-nav a[href="#tab-review"]').trigger('click');
-});
-$('.date, .datetime, .time').each(function () {
-  if (!$.fn.datetimepicker) return;
-  $(this).datetimepicker({
-    language: '{{ datepicker }}',
-    pickTime: $(this).hasClass('time') || $(this).hasClass('datetime'),
-    pickDate: !$(this).hasClass('time')
-  });
-});
-$('button[id^=\'button-upload\']').on('click', function() {
-  var node = this;
-  $('#form-upload').remove();
-  $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display:none;"><input type="file" name="file" /></form>');
-  $('#form-upload input[name=\'file\']').trigger('click');
-  if (typeof timer != 'undefined') { clearInterval(timer); }
-  timer = setInterval(function() {
-    if ($('#form-upload input[name=\'file\']').val() != '') {
-      clearInterval(timer);
-      $.ajax({
-        url: 'index.php?route=tool/upload',
-        type: 'post',
-        dataType: 'json',
-        data: new FormData($('#form-upload')[0]),
-        cache: false,
-        contentType: false,
-        processData: false,
-        success: function(json) {
-          if (json['error']) { $(node).parent().find('input').after('<div class="text-danger">' + json['error'] + '</div>'); }
-          if (json['success']) { $(node).parent().find('input').val(json['code']); }
+  </script>
+
+  <style>
+    :root {
+      --ui-radius: 14px;
+      --ui-radius-sm: 10px;
+      --ui-border-color: #E5E5E5;
+      --ui-border-width: 1px;
+      --ui-btn-accent: #111111;
+      --ui-btn-accent-hover: #262626;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: #FAFAFA;
+      color: #111111;
+      overflow-x: hidden;
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Динамические токены интерфейса (управляются из Панели настроек) */
+    .ui-card {
+      border-radius: var(--ui-radius);
+      border-width: var(--ui-border-width);
+      border-style: solid;
+      border-color: var(--ui-border-color);
+      transition: border-radius 0.3s var(--ease-out-expo), border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .ui-control {
+      border-radius: var(--ui-radius-sm);
+      transition: border-radius 0.3s var(--ease-out-expo), border-color 0.25s ease, background-color 0.25s ease, transform 0.2s ease;
+    }
+
+    /* Плавное появление карточек */
+    .reveal-card {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.75s var(--ease-out-expo), transform 0.75s var(--ease-out-expo);
+    }
+    .reveal-card.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Зум фото в галерее */
+    .gallery-img {
+      transition: transform 0.8s var(--ease-out-expo), filter 0.5s ease;
+      will-change: transform, filter;
+    }
+    .gallery-frame:hover .gallery-img {
+      transform: scale(1.03);
+    }
+
+    /* Главная кнопка действия с динамическим акцентом и зеленым подтверждением */
+    .btn-accent-dynamic {
+      background-color: var(--ui-btn-accent);
+      border-color: var(--ui-btn-accent);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, border-color 0.3s ease, border-radius 0.3s var(--ease-out-expo);
+    }
+    .btn-accent-dynamic:hover {
+      background-color: var(--ui-btn-accent-hover);
+      border-color: var(--ui-btn-accent-hover);
+    }
+    .btn-accent-dynamic:active {
+      transform: scale(0.98);
+    }
+    .btn-confirmed {
+      background-color: #16A34A !important;
+      border-color: #16A34A !important;
+      transform: scale(1.015);
+    }
+
+    /* Стили переключателей (Toggle Switches) в панели настроек */
+    .toggle-track {
+      width: 40px;
+      height: 22px;
+      border-radius: 9999px;
+      background-color: #E5E5E5;
+      position: relative;
+      transition: background-color 0.25s var(--ease-out-expo);
+      flex-shrink: 0;
+    }
+    .toggle-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 9999px;
+      background-color: #FFFFFF;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+      transition: transform 0.25s var(--ease-out-expo);
+    }
+    input:checked + .toggle-track {
+      background-color: #16A34A;
+    }
+    input:checked + .toggle-track .toggle-thumb {
+      transform: translateX(18px);
+    }
+
+    /* Анимация вкладок */
+    @keyframes tabFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .tab-pane-active {
+      animation: tabFadeIn 0.35s var(--ease-out-expo) forwards;
+    }
+
+    /* Скрытие полосы прокрутки */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-[#111111] selection:text-white">
+<input type="hidden" id="oc-product-id" value="{{ product_id }}" />
+<input type="hidden" id="oc-minimum" value="{{ minimum ?: 1 }}" />
+
+  <!-- ==================== 1. ЛИПКАЯ ШАПКА С ПОИСКОМ, ИЗБРАННЫМ И КОРЗИНОЙ ==================== -->
+  <header class="sticky top-0 z-40 bg-[#FAFAFA]/95 backdrop-blur-md border-b border-[#E5E5E5]">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Бренд и навигация -->
+      <div class="flex items-center gap-6 lg:gap-8 min-w-0">
+        <a href="#" class="font-display font-bold tracking-[0.14em] text-sm uppercase text-[#111111] shrink-0">
+          NORDIC FORM
+        </a>
+        <nav aria-label="Хлебные крошки" class="hidden xl:flex items-center gap-2 text-xs text-neutral-400 truncate">
+          <a href="#" class="hover:text-[#111111] transition-colors">Каталог</a>
+          <span>/</span>
+          <a href="#" class="hover:text-[#111111] transition-colors">Мебель</a>
+          <span>/</span>
+          <a href="#" class="hover:text-[#111111] transition-colors">Лаунж-кресла</a>
+          <span>/</span>
+          <span class="text-[#111111] font-medium">AERO 04</span>
+        </nav>
+      </div>
+
+      <!-- Интерактивный поиск по каталогу -->
+      <div class="relative flex-1 max-w-xs hidden md:block">
+        <div class="relative flex items-center">
+          <svg class="w-3.5 h-3.5 text-neutral-400 absolute left-3.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
+          </svg>
+          <input
+            type="text"
+            id="catalogSearchInput"
+            placeholder="Поиск по коллекции (пуф, торшер, дуб)..."
+            autocomplete="off"
+            class="w-full pl-9 pr-3 py-1.5 rounded-full bg-white border border-[#E5E5E5] focus:border-[#111111] focus:outline-none text-xs text-[#111111] placeholder:text-neutral-400 transition-colors"
+          />
+        </div>
+        <!-- Выпадающий список результатов -->
+        <div id="searchDropdown" class="hidden absolute left-0 right-0 mt-2 bg-white border border-[#E5E5E5] rounded-xl shadow-lg overflow-hidden z-50"></div>
+      </div>
+
+      <!-- Правые действия -->
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <a href="#detailsTabsSection" class="hidden lg:inline-block px-2.5 py-1.5 text-xs text-neutral-500 hover:text-[#111111] transition-colors">
+          Чертеж 1:1
+        </a>
+        <a href="#companionSection" class="hidden lg:inline-block px-2.5 py-1.5 text-xs text-neutral-500 hover:text-[#111111] transition-colors">
+          Комплект
+        </a>
+
+        <!-- Избранное со счетчиком -->
+        <button
+          type="button"
+          id="headerWishBtn"
+          aria-label="Избранное"
+          class="relative flex items-center gap-1.5 px-3 py-2 rounded-full bg-white border border-[#E5E5E5] hover:border-[#111111] transition-colors"
+        >
+          <svg id="headerWishSvg" class="w-4 h-4 text-[#111111] transition-colors" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+          </svg>
+          <span id="headerWishCount" class="hidden px-1.5 py-0.2 rounded-full bg-[#DC2626] text-white font-mono text-[10px] font-medium tabular">1</span>
+        </button>
+
+        <!-- Корзина -->
+        <button
+          type="button"
+          id="openCartBtn"
+          class="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-full bg-white border border-[#E5E5E5] hover:border-[#111111] text-xs font-medium transition-colors"
+        >
+          <span>Корзина</span>
+          <span id="cartBadge" class="w-5 h-5 rounded-full bg-[#111111] text-white font-mono text-[11px] flex items-center justify-center tabular">1</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 2. ФИКСИРОВАННАЯ КНОПКА-ТРИГГЕР ПАНЕЛИ НАСТРОЕК ==================== -->
+  <button
+    type="button"
+    id="openCustomizerBtn"
+    aria-label="Открыть панель настроек интерфейса"
+    class="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center gap-2.5 pl-3.5 pr-3 py-3 bg-[#111111] hover:bg-neutral-800 text-white rounded-l-xl shadow-lg border border-r-0 border-white/15 transition-all duration-300 group"
+  >
+    <svg class="w-4 h-4 text-white group-hover:rotate-45 transition-transform duration-300 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+    </svg>
+    <span class="hidden sm:inline font-mono text-xs font-medium tracking-wide">Настройки</span>
+    <span id="customizerChangedBadge" class="hidden w-4 h-4 rounded-full bg-[#16A34A] text-white font-mono text-[10px] font-bold flex items-center justify-center tabular">0</span>
+  </button>
+
+  <!-- ==================== 3. ОСНОВНОЙ КОНТЕНТ КАРТОЧКИ ТОВАРА ==================== -->
+  <main class="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 pt-6 sm:pt-10 pb-24">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+
+      <!-- ЛЕВАЯ КОЛОНКА (7 колонок): ДИНАМИЧЕСКАЯ ГАЛЕРЕЯ (3 РЕЖИМА ИЗ НАСТРОЕК) -->
+      <div class="lg:col-span-7 space-y-5">
+
+        <!-- Верхняя панель фильтров ракурсов и подсказки -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#E5E5E5]">
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar" id="galleryFilterGroup">
+            <button type="button" data-view="all" class="view-filter-btn px-3.5 py-1.5 rounded-full bg-[#111111] text-white text-xs font-medium whitespace-nowrap transition-colors">
+              Все фото (05)
+            </button>
+            <button type="button" data-view="studio" class="view-filter-btn px-3.5 py-1.5 rounded-full bg-transparent text-neutral-500 hover:text-[#111111] text-xs font-medium whitespace-nowrap transition-colors">
+              Студия
+            </button>
+            <button type="button" data-view="detail" class="view-filter-btn px-3.5 py-1.5 rounded-full bg-transparent text-neutral-500 hover:text-[#111111] text-xs font-medium whitespace-nowrap transition-colors">
+              Детали и фактура
+            </button>
+            <button type="button" data-view="interior" class="view-filter-btn px-3.5 py-1.5 rounded-full bg-transparent text-neutral-500 hover:text-[#111111] text-xs font-medium whitespace-nowrap transition-colors">
+              В интерьере
+            </button>
+          </div>
+          <span class="hidden sm:inline font-mono text-[11px] text-neutral-400">НАЖМИТЕ НА ФОТО ДЛЯ ЗУМА</span>
+        </div>
+
+        <!-- РЕЖИМ A: СЕТКА С ВЕРТИКАЛЬНЫМ СКРОЛЛОМ (ПО УМОЛЧАНИЮ) -->
+        <div id="galleryLayoutGrid" class="space-y-5 sm:space-y-6">
+          <!-- Главный кадр -->
+          <figure data-category="studio" data-index="0" class="gallery-card reveal-card gallery-frame ui-card relative bg-white overflow-hidden cursor-zoom-in group">
+            <div class="relative aspect-[16/12] overflow-hidden bg-[#F5F5F4]">
+              <img
+                id="primaryChairImage"
+                src="{{ thumb ?: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=1400&q=85' }}"
+                alt="NORDIC FORM AERO 04 — Фронтальный ракурс"
+                onerror="this.onerror=null;this.src='https://placehold.co/1200x900/F5F5F4/111111?text=NORDIC+FORM+AERO+04';"
+                class="gallery-img w-full h-full object-cover"
+              />
+              <!-- Живой бейдж выбранного материала на фото -->
+              <div class="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-sm border border-[#E5E5E5] text-xs">
+                <span id="photoSwatchDot" class="w-2.5 h-2.5 rounded-full bg-[#F3EFEA] border border-neutral-400"></span>
+                <span id="photoFabricLabel" class="font-medium text-[#111111]">Буклее Айвори</span>
+              </div>
+            </div>
+            <figcaption class="px-5 py-3.5 bg-white border-t border-[#E5E5E5] flex items-center justify-between text-xs text-neutral-500">
+              <span>01 / Архитектурный силуэт и эргономичный наклон спинки 104°</span>
+              <span class="font-mono text-[#111111] group-hover:translate-x-0.5 transition-transform">↗</span>
+            </figcaption>
+          </figure>
+
+          <!-- Пара деталей -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+            <figure data-category="detail" data-index="1" class="gallery-card reveal-card gallery-frame ui-card relative bg-white overflow-hidden cursor-zoom-in group">
+              <div class="aspect-square overflow-hidden bg-[#F5F5F4]">
+                <img
+                  src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=85"
+                  alt="Фактура обивки"
+                  onerror="this.onerror=null;this.src='https://placehold.co/800x800/F5F5F4/111111?text=FABRIC+TEXTURE';"
+                  class="gallery-img w-full h-full object-cover"
+                />
+              </div>
+              <figcaption class="px-4 py-3 bg-white border-t border-[#E5E5E5] flex items-center justify-between text-xs text-neutral-500">
+                <span>02 / Тактильное плетение и плотность</span>
+                <span class="font-mono text-[#111111]">↗</span>
+              </figcaption>
+            </figure>
+
+            <figure data-category="interior" data-index="2" class="gallery-card reveal-card gallery-frame ui-card relative bg-white overflow-hidden cursor-zoom-in group">
+              <div class="aspect-square overflow-hidden bg-[#F5F5F4]">
+                <img
+                  src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&w=900&q=85"
+                  alt="В светлой гостиной"
+                  onerror="this.onerror=null;this.src='https://placehold.co/800x800/F5F5F4/111111?text=LIVING+ROOM';"
+                  class="gallery-img w-full h-full object-cover"
+                />
+              </div>
+              <figcaption class="px-4 py-3 bg-white border-t border-[#E5E5E5] flex items-center justify-between text-xs text-neutral-500">
+                <span>03 / Интеграция в светлый интерьер</span>
+                <span class="font-mono text-[#111111]">↗</span>
+              </figcaption>
+            </figure>
+          </div>
+
+          <!-- Атмосферный широкий кадр -->
+          <figure data-category="interior" data-index="3" class="gallery-card reveal-card gallery-frame ui-card relative bg-white overflow-hidden cursor-zoom-in group">
+            <div class="aspect-[16/10] overflow-hidden bg-[#F5F5F4]">
+              <img
+                src="https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=1400&q=85"
+                alt="Пространство Japandi"
+                onerror="this.onerror=null;this.src='https://placehold.co/1200x750/F5F5F4/111111?text=JAPANDI+INTERIOR';"
+                class="gallery-img w-full h-full object-cover"
+              />
+            </div>
+            <figcaption class="px-5 py-3.5 bg-white border-t border-[#E5E5E5] flex items-center justify-between text-xs text-neutral-500">
+              <span>04 / Баланс натурального дерева и мягкой геометрии</span>
+              <span class="font-mono text-[#111111]">↗</span>
+            </figcaption>
+          </figure>
+
+          <!-- Деталь каркаса -->
+          <figure data-category="detail" data-index="4" class="gallery-card reveal-card gallery-frame ui-card relative bg-white overflow-hidden cursor-zoom-in group">
+            <div class="aspect-[16/9] overflow-hidden bg-[#F5F5F4]">
+              <img
+                src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1400&q=85"
+                alt="Эргономика посадки"
+                onerror="this.onerror=null;this.src='https://placehold.co/1200x675/F5F5F4/111111?text=ERGONOMICS';"
+                class="gallery-img w-full h-full object-cover"
+              />
+            </div>
+            <figcaption class="px-5 py-3.5 bg-white border-t border-[#E5E5E5] flex items-center justify-between text-xs text-neutral-500">
+              <span>05 / Многослойный наполнитель с эффектом памяти формы</span>
+              <span class="font-mono text-[#111111]">↗</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <!-- РЕЖИМ B / C: СЛАЙДЕР С МИНИАТЮРАМИ (СЛЕВА ИЛИ СНИЗУ — УПРАВЛЯЕТСЯ ПАНЕЛЬЮ НАСТРОЕК) -->
+        <div id="galleryLayoutSlider" class="hidden gap-4">
+          <!-- Контейнер миниатюр -->
+          <div id="sliderThumbsContainer" class="flex gap-2.5 shrink-0"></div>
+
+          <!-- Основной слайд -->
+          <div class="flex-1 ui-card bg-white overflow-hidden relative group">
+            <div class="relative aspect-[4/3] bg-[#F5F5F4] overflow-hidden cursor-zoom-in" id="sliderMainStage">
+              <img id="sliderActiveImg" src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=1400&q=85" alt="Слайд товара" class="w-full h-full object-cover transition-all duration-500" />
+              <button type="button" id="sliderPrevBtn" aria-label="Предыдущее фото" class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 border border-[#E5E5E5] hover:border-[#111111] flex items-center justify-center text-sm shadow-sm transition-colors">←</button>
+              <button type="button" id="sliderNextBtn" aria-label="Следующее фото" class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 border border-[#E5E5E5] hover:border-[#111111] flex items-center justify-center text-sm shadow-sm transition-colors">→</button>
+            </div>
+            <div class="px-5 py-3.5 bg-white border-t border-[#E5E5E5] flex items-center justify-between text-xs text-neutral-500">
+              <span id="sliderCaption">01 / Архитектурный силуэт и эргономичный наклон спинки 104°</span>
+              <span id="sliderCounter" class="font-mono text-[#111111]">1 / 5</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ИНТЕРАКТИВНЫЙ БЛОК ПОД ГАЛЕРЕЕЙ (ВКЛАДКИ) -->
+        <section id="detailsTabsSection" class="pt-6">
+          <div class="ui-card bg-white overflow-hidden">
+            <!-- Навигация по вкладкам -->
+            <div class="flex items-center border-b border-[#E5E5E5] overflow-x-auto no-scrollbar">
+              <button type="button" data-tab="concept" class="detail-tab-btn px-5 py-4 text-xs font-medium border-b-2 border-[#111111] text-[#111111] whitespace-nowrap transition-colors">
+                Описание и концепция
+              </button>
+              <button type="button" data-tab="specs" class="detail-tab-btn px-5 py-4 text-xs font-medium border-b-2 border-transparent text-neutral-500 hover:text-[#111111] whitespace-nowrap transition-colors">
+                Характеристики
+              </button>
+              <button type="button" data-tab="blueprint" class="detail-tab-btn px-5 py-4 text-xs font-medium border-b-2 border-transparent text-neutral-500 hover:text-[#111111] whitespace-nowrap transition-colors">
+                Чертеж 1:1
+              </button>
+              <button type="button" data-tab="reviews" class="detail-tab-btn px-5 py-4 text-xs font-medium border-b-2 border-transparent text-neutral-500 hover:text-[#111111] whitespace-nowrap transition-colors flex items-center gap-1.5">
+                <span>Отзывы</span>
+                <span id="tabReviewsCounter" class="px-1.5 py-0.5 rounded-full bg-[#FAFAFA] border border-[#E5E5E5] font-mono text-[10px] text-[#111111]">24</span>
+              </button>
+              <button type="button" data-tab="delivery" class="detail-tab-btn px-5 py-4 text-xs font-medium border-b-2 border-transparent text-neutral-500 hover:text-[#111111] whitespace-nowrap transition-colors">
+                Доставка и возврат
+              </button>
+            </div>
+
+            <!-- Контент вкладок -->
+            <div class="p-6 sm:p-8">
+              
+              <!-- Вкладка 1: Концепция -->
+              <div id="pane-concept" class="detail-pane tab-pane-active space-y-4">
+                <h3 class="font-display text-lg font-semibold text-[#111111]">Философия тихого комфорта</h3>
+                <div class="text-sm text-neutral-600 leading-relaxed">
+                  {{ description }}
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                  <div class="p-4 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5]">
+                    <div class="font-mono text-xs text-[#16A34A] font-medium">85 000+ ЦИКЛОВ</div>
+                    <div class="text-xs font-medium text-[#111111] mt-1">Износостойкость</div>
+                    <p class="text-[11px] text-neutral-500 mt-1">Тест Мартиндейла для коммерческих и жилых пространств.</p>
+                  </div>
+                  <div class="p-4 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5]">
+                    <div class="font-mono text-xs text-[#111111] font-medium">FSC ДРЕВЕСИНА</div>
+                    <div class="text-xs font-medium text-[#111111] mt-1">Массив дуба и ореха</div>
+                    <p class="text-[11px] text-neutral-500 mt-1">Ручная шлифовка и покрытие натуральным матовым маслом OSMO.</p>
+                  </div>
+                  <div class="p-4 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5]">
+                    <div class="font-mono text-xs text-[#111111] font-medium">БЕЗ СБОРКИ</div>
+                    <div class="text-xs font-medium text-[#111111] mt-1">Цельный каркас</div>
+                    <p class="text-[11px] text-neutral-500 mt-1">Поставляется в готовом виде в усиленной защитной упаковке.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Вкладка 2: Характеристики -->
+              <div id="pane-specs" class="detail-pane hidden">
+                <dl class="divide-y divide-[#E5E5E5] text-xs">
+                  <div class="py-3 flex justify-between gap-4">
+                    <dt class="text-neutral-500">Выбранный размер</dt>
+                    <dd id="specSizeValue" class="font-mono font-medium text-[#111111]">Standard (78 × 84 × 76 см)</dd>
+                  </div>
+                  <div class="py-3 flex justify-between gap-4">
+                    <dt class="text-neutral-500">Высота сиденья от пола</dt>
+                    <dd class="font-mono font-medium text-[#111111]">41 см</dd>
+                  </div>
+                  <div class="py-3 flex justify-between gap-4">
+                    <dt class="text-neutral-500">Выбранная обивка</dt>
+                    <dd id="specFabricValue" class="font-medium text-[#111111]">Буклее Айвори (85 000 циклов)</dd>
+                  </div>
+                  <div class="py-3 flex justify-between gap-4">
+                    <dt class="text-neutral-500">Каркас и опоры</dt>
+                    <dd id="specFrameValue" class="font-medium text-[#111111]">Беленый дуб</dd>
+                  </div>
+                  <div class="py-3 flex justify-between gap-4">
+                    <dt class="text-neutral-500">Наполнитель</dt>
+                    <dd class="text-[#111111]">Многослойный латекс высокой плотности + гусиный пух</dd>
+                  </div>
+                  <div class="py-3 flex justify-between gap-4">
+                    <dt class="text-neutral-500">Максимальная нагрузка / Вес</dt>
+                    <dd class="font-mono font-medium text-[#111111]">до 145 кг / 16.8 кг</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <!-- Вкладка 3: Интерактивный чертеж 1:1 -->
+              <div id="pane-blueprint" class="detail-pane hidden space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <div class="text-xs font-medium text-[#111111]">Техническая проекция <span id="bpSizeTitle" class="font-mono text-neutral-500">(Standard)</span></div>
+                    <div class="text-[11px] text-neutral-400">Размеры автоматически обновляются при смене размера кресла</div>
+                  </div>
+                  <div class="inline-flex rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] p-0.5 font-mono text-xs">
+                    <button type="button" id="bpCmBtn" class="px-3 py-1 rounded-md bg-[#111111] text-white transition-colors">см</button>
+                    <button type="button" id="bpMmBtn" class="px-3 py-1 rounded-md text-neutral-500 hover:text-[#111111] transition-colors">мм</button>
+                  </div>
+                </div>
+
+                <div class="p-6 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] flex flex-col items-center">
+                  <svg viewBox="0 0 420 220" class="w-full max-w-md h-auto stroke-[#111111] fill-none" stroke-width="1.5">
+                    <!-- Вид сбоку -->
+                    <path d="M 55 45 L 78 135 L 175 135" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M 66 90 L 165 108" stroke="#737373" stroke-dasharray="3 3" />
+                    <line x1="82" y1="135" x2="66" y2="178" stroke-width="2" stroke-linecap="round" />
+                    <line x1="162" y1="135" x2="178" y2="178" stroke-width="2" stroke-linecap="round" />
+                    <!-- Размер высоты -->
+                    <line x1="34" y1="45" x2="34" y2="178" stroke="#DC2626" stroke-width="1" />
+                    <text id="svgDimH" x="6" y="115" font-family="JetBrains Mono" font-size="10" fill="#DC2626" stroke="none">76 см</text>
+                    <!-- Размер глубины -->
+                    <line x1="66" y1="195" x2="178" y2="195" stroke="#DC2626" stroke-width="1" />
+                    <text id="svgDimD" x="102" y="212" font-family="JetBrains Mono" font-size="10" fill="#DC2626" stroke="none">84 см</text>
+
+                    <!-- Вид спереди -->
+                    <rect x="245" y="55" width="125" height="80" rx="12" stroke-width="2" />
+                    <line x1="265" y1="135" x2="258" y2="178" stroke-width="2" stroke-linecap="round" />
+                    <line x1="350" y1="135" x2="357" y2="178" stroke-width="2" stroke-linecap="round" />
+                    <!-- Размер ширины -->
+                    <line x1="245" y1="195" x2="370" y2="195" stroke="#DC2626" stroke-width="1" />
+                    <text id="svgDimW" x="288" y="212" font-family="JetBrains Mono" font-size="10" fill="#DC2626" stroke="none">78 см</text>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Вкладка 4: Отзывы покупателей -->
+              <div id="pane-reviews" class="detail-pane hidden space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#E5E5E5]">
+                  <div class="flex items-center gap-3">
+                    <span class="font-display text-2xl font-bold text-[#111111]">4.95</span>
+                    <div class="text-xs">
+                      <div class="text-[#111111] tracking-wider">★★★★★</div>
+                      <div class="text-neutral-400">На основе 24 проверенных покупок</div>
+                    </div>
+                  </div>
+                  <div class="flex gap-1.5" id="reviewFilterBtns">
+                    <button type="button" data-rfilter="all" class="rfilter-btn px-3 py-1 rounded-full bg-[#111111] text-white text-xs">Все</button>
+                    <button type="button" data-rfilter="photo" class="rfilter-btn px-3 py-1 rounded-full bg-[#FAFAFA] border border-[#E5E5E5] text-xs">С подтверждением</button>
+                  </div>
+                </div>
+
+                <div id="reviewsList" class="space-y-4">
+                  <article data-verified="true" class="p-4 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                      <div class="flex items-center gap-2">
+                        <span class="font-semibold text-[#111111]">Марина Соколова</span>
+                        <span class="px-2 py-0.5 rounded-full bg-[#16A34A]/10 text-[#16A34A] text-[10px] font-medium">✓ Покупка подтверждена</span>
+                      </div>
+                      <span class="font-mono text-[11px] text-neutral-400">18.11.2026</span>
+                    </div>
+                    <div class="text-xs text-neutral-400">Конфигурация: Буклее Айвори · Беленый дуб · Lounge Wide</div>
+                    <p class="text-xs text-neutral-700 leading-relaxed">
+                      Брали версию Lounge Wide для зоны чтения у окна. Посадка невероятно глубокая и мягкая, ткань букле очень приятная на ощупь и не притягивает пыль.
+                    </p>
+                  </article>
+
+                  <article data-verified="true" class="p-4 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                      <div class="flex items-center gap-2">
+                        <span class="font-semibold text-[#111111]">Алексей Кравцов</span>
+                        <span class="px-2 py-0.5 rounded-full bg-[#16A34A]/10 text-[#16A34A] text-[10px] font-medium">✓ Покупка подтверждена</span>
+                      </div>
+                      <span class="font-mono text-[11px] text-neutral-400">09.11.2026</span>
+                    </div>
+                    <div class="text-xs text-neutral-400">Конфигурация: Анилиновая кожа Коньяк · Орех американский</div>
+                    <p class="text-xs text-neutral-700 leading-relaxed">
+                      Анилиновая кожа в оттенке коньяк выглядит благородно, в сочетании с американским орехом — идеальная пара. Привезли на следующий день уже в собранном виде.
+                    </p>
+                  </article>
+                </div>
+
+                <!-- Форма добавления отзыва -->
+                <form id="reviewSubmitForm" class="p-4 rounded-xl border border-[#E5E5E5] bg-white space-y-3">
+                  <div class="text-xs font-semibold text-[#111111]">Оставить отзыв о модели AERO 04</div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="text" id="revAuthorInput" required placeholder="Ваше имя" class="px-3.5 py-2 rounded-lg border border-[#E5E5E5] focus:border-[#111111] focus:outline-none text-xs" />
+                    <select id="revRatingInput" class="px-3.5 py-2 rounded-lg border border-[#E5E5E5] bg-white focus:border-[#111111] focus:outline-none text-xs">
+                      <option value="★★★★★">★★★★★ — Отлично (5.0)</option>
+                      <option value="★★★★☆">★★★★☆ — Хорошо (4.0)</option>
+                    </select>
+                  </div>
+                  <textarea id="revTextInput" rows="2" required placeholder="Поделитесь впечатлениями о комфорте и материалах..." class="w-full px-3.5 py-2 rounded-lg border border-[#E5E5E5] focus:border-[#111111] focus:outline-none text-xs resize-none"></textarea>
+                  <button type="submit" class="px-4 py-2 rounded-lg bg-[#111111] text-white text-xs font-medium hover:bg-neutral-800 transition-colors">
+                    Опубликовать отзыв
+                  </button>
+                </form>
+              </div>
+
+              <!-- Вкладка 5: Доставка и возврат -->
+              <div id="pane-delivery" class="detail-pane hidden space-y-3 text-xs text-neutral-600 leading-relaxed">
+                <div class="p-4 rounded-xl bg-[#16A34A]/5 border border-[#16A34A]/20 text-[#16A34A] font-medium">
+                  ✓ При заказе от 50 000 ₽ — бесплатная доставка собственной службой логистики, подъем на этаж и распаковка.
+                </div>
+                <p>Доставка по Москве и Санкт-Петербургу осуществляется на следующий день при оформлении до 18:00. Отправка в регионы транспортными компаниями в жесткой обрешетке занимает 2–5 рабочих дней.</p>
+                <p>Вы можете вернуть или обменять кресло в течение 14 дней с момента получения, если сохранен товарный вид и оригинальная упаковка.</p>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ПРАВАЯ КОЛОНКА (5 колонок): ЛИПКАЯ ПАНЕЛЬ КОНФИГУРАЦИИ И ПОКУПКИ -->
+      <div class="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
+        <div class="ui-card bg-white p-6 sm:p-8 space-y-6">
+
+          <!-- Мета-строка: Артикул + Зеленый статус наличия -->
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-xs text-neutral-400">SKU · {{ model }}</span>
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#16A34A]/10 text-[#16A34A] text-xs font-medium">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#16A34A] opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-[#16A34A]"></span>
+              </span>
+              <span>{{ stock }}</span>
+            </div>
+          </div>
+
+          <!-- Заголовок и краткое описание -->
+          <div>
+            <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#111111] leading-tight">
+              {{ heading_title }}
+            </h1>
+            <p class="mt-2 text-xs sm:text-sm text-neutral-500 leading-relaxed">
+              Архитектурное лаунж-кресло в эстетике Japandi. Глубокая эргономичная посадка, натуральный массив и премиальные тактильные обивки.
+            </p>
+          </div>
+
+          <!-- Блок цены, скидки и рассрочки -->
+          <div class="pt-4 border-t border-[#E5E5E5] space-y-2.5">
+            <div class="flex items-baseline flex-wrap gap-2.5">
+              <span id="displayPrice" class="font-mono text-3xl font-semibold tracking-tight text-[#111111] tabular">
+                89 000 ₽
+              </span>
+              <span id="displayOldPrice" class="discount-element font-mono text-sm text-neutral-400 line-through tabular">
+                108 500 ₽
+              </span>
+              <span class="discount-element px-2 py-0.5 rounded bg-[#DC2626] text-white font-mono text-xs font-semibold">
+                -18%
+              </span>
+              <span id="displaySavings" class="discount-element ml-auto font-mono text-xs text-[#16A34A] font-medium tabular">
+                Выгода 19 500 ₽
+              </span>
+            </div>
+
+            <!-- Рассрочка / Промо -->
+            <div id="installmentBlock" class="flex items-center justify-between px-3 py-2 rounded-lg bg-[#FAFAFA] border border-[#E5E5E5] text-xs">
+              <span class="text-neutral-600">Рассрочка 0% без переплат:</span>
+              <span id="installmentValue" class="font-mono font-medium text-[#111111] tabular">4 × 22 250 ₽</span>
+            </div>
+
+            <!-- Индикатор остатков и live-просмотры -->
+            <div id="stockUrgencyBlock" class="flex items-center justify-between text-xs pt-0.5">
+              <span class="text-[#DC2626] font-medium">● Осталось 3 шт. в этой партии</span>
+              <span class="font-mono text-[11px] text-neutral-400"><span id="liveViewersCount">7</span> чел. смотрят сейчас</span>
+            </div>
+          </div>
+
+          <!-- 1. ВЫБОР ОБИВКИ / МАТЕРИАЛА (6 ВАРИАНТОВ В 2 КАТЕГОРИЯХ) -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-[#111111]">1. Обивка и фактура</span>
+              <span id="selectedFabricBadge" class="text-neutral-500">Буклее Айвори · База</span>
+            </div>
+
+            <!-- Категория: Текстиль Буклее -->
+            <div class="space-y-1.5">
+              <div class="font-mono text-[10px] uppercase tracking-wider text-neutral-400">Текстиль Буклее (85 000 циклов Martindale)</div>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  data-fabric="Буклее Айвори"
+                  data-category-label="Текстиль Буклее (85 000 циклов)"
+                  data-delta="0"
+                  data-swatch="#F3EFEA"
+                  data-filter="none"
+                  class="fabric-btn ui-control flex items-center gap-2.5 p-2.5 border border-[#111111] bg-[#FAFAFA] text-left"
+                >
+                  <span class="w-5 h-5 rounded-full bg-[#F3EFEA] border border-neutral-300 shrink-0"></span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-medium text-[#111111] truncate">Буклее Айвори</div>
+                    <div class="font-mono text-[10px] text-neutral-400">База</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  data-fabric="Буклее Графит"
+                  data-category-label="Текстиль Буклее (85 000 циклов)"
+                  data-delta="0"
+                  data-swatch="#3A3A3C"
+                  data-filter="brightness(0.82) contrast(1.1) saturate(0.75)"
+                  class="fabric-btn ui-control flex items-center gap-2.5 p-2.5 border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left"
+                >
+                  <span class="w-5 h-5 rounded-full bg-[#3A3A3C] border border-black/20 shrink-0"></span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-medium text-[#111111] truncate">Буклее Графит</div>
+                    <div class="font-mono text-[10px] text-neutral-400">База</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  data-fabric="Буклее Терракота"
+                  data-category-label="Текстиль Буклее (85 000 циклов)"
+                  data-delta="4000"
+                  data-swatch="#B85D43"
+                  data-filter="sepia(0.35) saturate(1.45) hue-rotate(-14deg) brightness(0.94)"
+                  class="fabric-btn ui-control flex items-center gap-2.5 p-2.5 border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left relative"
+                >
+                  <span class="w-5 h-5 rounded-full bg-[#B85D43] border border-black/15 shrink-0"></span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1">
+                      <span class="text-xs font-medium text-[#111111] truncate">Терракота</span>
+                      <span class="px-1 rounded bg-[#16A34A]/15 text-[#16A34A] font-mono text-[9px] font-bold">NEW</span>
+                    </div>
+                    <div class="font-mono text-[10px] text-neutral-500">+4 000 ₽</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  data-fabric="Буклее Шалфей"
+                  data-category-label="Текстиль Буклее (85 000 циклов)"
+                  data-delta="4000"
+                  data-swatch="#7D8C7D"
+                  data-filter="sepia(0.22) hue-rotate(68deg) saturate(1.1) brightness(0.93)"
+                  class="fabric-btn ui-control flex items-center gap-2.5 p-2.5 border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left"
+                >
+                  <span class="w-5 h-5 rounded-full bg-[#7D8C7D] border border-black/15 shrink-0"></span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-medium text-[#111111] truncate">Буклее Шалфей</div>
+                    <div class="font-mono text-[10px] text-neutral-500">+4 000 ₽</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Категория: Натуральная анилиновая кожа -->
+            <div class="space-y-1.5 pt-1">
+              <div class="font-mono text-[10px] uppercase tracking-wider text-neutral-400">Натуральная анилиновая кожа (Full-Grain)</div>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  data-fabric="Анилиновая кожа Коньяк"
+                  data-category-label="Анилиновая кожа Full-Grain"
+                  data-delta="18000"
+                  data-swatch="#8B4513"
+                  data-filter="sepia(0.55) saturate(1.6) hue-rotate(-10deg) brightness(0.84)"
+                  class="fabric-btn ui-control flex items-center gap-2.5 p-2.5 border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left"
+                >
+                  <span class="w-5 h-5 rounded-full bg-[#8B4513] border border-black/20 shrink-0"></span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-medium text-[#111111] truncate">Кожа Коньяк</div>
+                    <div class="font-mono text-[10px] text-neutral-500">+18 000 ₽</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  data-fabric="Анилиновая кожа Обсидиан"
+                  data-category-label="Анилиновая кожа Full-Grain"
+                  data-delta="18000"
+                  data-swatch="#18181B"
+                  data-filter="brightness(0.72) contrast(1.2) saturate(0.8)"
+                  class="fabric-btn ui-control flex items-center gap-2.5 p-2.5 border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left"
+                >
+                  <span class="w-5 h-5 rounded-full bg-[#18181B] border border-black/30 shrink-0"></span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-medium text-[#111111] truncate">Кожа Обсидиан</div>
+                    <div class="font-mono text-[10px] text-neutral-500">+18 000 ₽</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. ВЫБОР КАРКАСА И ОПОР (4 ВАРИАНТА) -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-[#111111]">2. Каркас и опоры</span>
+              <span id="selectedFrameBadge" class="text-neutral-500">Беленый дуб</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" data-frame="Беленый дуб" data-delta="0" class="frame-btn ui-control p-2.5 border border-[#111111] bg-[#FAFAFA] text-left">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-[#D8C7B0] border border-black/15"></span>
+                  <span class="text-xs font-medium text-[#111111]">Беленый дуб</span>
+                </div>
+                <div class="font-mono text-[10px] text-neutral-400 mt-1 pl-5">Включено</div>
+              </button>
+
+              <button type="button" data-frame="Орех американский" data-delta="4500" class="frame-btn ui-control p-2.5 border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-[#5C3A21] border border-black/15"></span>
+                  <span class="text-xs font-medium text-[#111111]">Орех американский</span>
+                </div>
+                <div class="font-mono text-[10px] text-neutral-500 mt-1 pl-5">+4 500 ₽</div>
+              </button>
+
+              <button type="button" data-frame="Черный матовый металл" data-delta="2000" class="frame-btn ui-control p-2.5 border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-[#1F1F22] border border-black/15"></span>
+                  <span class="text-xs font-medium text-[#111111]">Черный металл</span>
+                </div>
+                <div class="font-mono text-[10px] text-neutral-500 mt-1 pl-5">+2 000 ₽</div>
+              </button>
+
+              <button type="button" data-frame="Брашированная латунь" data-delta="9500" class="frame-btn ui-control p-2.5 border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-[#C5A059] border border-black/15"></span>
+                  <span class="text-xs font-medium text-[#111111]">Латунь браш</span>
+                </div>
+                <div class="font-mono text-[10px] text-neutral-500 mt-1 pl-5">+9 500 ₽</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. РАЗМЕР И ПОСАДКА (3 ВАРИАНТА С ПЕРЕСЧЕТОМ ЧЕРТЕЖА И ЦЕНЫ) -->
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-[#111111]">3. Размер и посадка</span>
+              <button type="button" id="jumpToBlueprintBtn" class="font-mono text-[11px] text-neutral-500 hover:text-[#111111] underline underline-offset-4">
+                Схема размеров →
+              </button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                data-size="Standard"
+                data-dims="78 × 84 × 76"
+                data-w="78"
+                data-d="84"
+                data-h="76"
+                data-delta="0"
+                class="size-btn ui-control p-2.5 border border-[#111111] bg-[#FAFAFA] text-left"
+              >
+                <div class="text-xs font-semibold text-[#111111]">Standard</div>
+                <div class="font-mono text-[10px] text-neutral-500 mt-0.5">78×84×76</div>
+                <div class="font-mono text-[10px] text-neutral-400 mt-1">База</div>
+              </button>
+
+              <button
+                type="button"
+                data-size="Lounge Wide"
+                data-dims="92 × 90 × 74"
+                data-w="92"
+                data-d="90"
+                data-h="74"
+                data-delta="11000"
+                class="size-btn ui-control p-2.5 border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left"
+              >
+                <div class="text-xs font-semibold text-[#111111]">Lounge Wide</div>
+                <div class="font-mono text-[10px] text-neutral-500 mt-0.5">92×90×74</div>
+                <div class="font-mono text-[10px] text-[#111111] mt-1">+11 000 ₽</div>
+              </button>
+
+              <button
+                type="button"
+                data-size="High Back"
+                data-dims="80 × 86 × 94"
+                data-w="80"
+                data-d="86"
+                data-h="94"
+                data-delta="14000"
+                class="size-btn ui-control p-2.5 border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left"
+              >
+                <div class="text-xs font-semibold text-[#111111]">High Back</div>
+                <div class="font-mono text-[10px] text-neutral-500 mt-0.5">80×86×94</div>
+                <div class="font-mono text-[10px] text-[#111111] mt-1">+14 000 ₽</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. КОМПАКТНЫЙ БЛОК ЧЕРТЕЖА (ВИДИМОСТЬ УПРАВЛЯЕТСЯ ИЗ НАСТРОЕК) -->
+          <div id="cardBlueprintWidget" class="p-3.5 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] flex items-center justify-between gap-4">
+            <svg viewBox="0 0 120 80" class="w-24 h-16 shrink-0 stroke-[#111111] fill-none" stroke-width="1.4">
+              <path d="M 24 16 L 36 50 L 88 50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <line x1="38" y1="50" x2="30" y2="68" stroke-width="1.6" stroke-linecap="round" />
+              <line x1="80" y1="50" x2="88" y2="68" stroke-width="1.6" stroke-linecap="round" />
+              <line x1="14" y1="16" x2="14" y2="68" stroke="#DC2626" stroke-width="0.9" />
+              <line x1="30" y1="74" x2="88" y2="74" stroke="#DC2626" stroke-width="0.9" />
+            </svg>
+            <div class="grid grid-cols-3 gap-2 flex-1 font-mono text-xs tabular">
+              <div>
+                <div class="text-[10px] text-neutral-400">ШИРИНА</div>
+                <div id="miniDimW" class="font-semibold text-[#111111]">78 см</div>
+              </div>
+              <div>
+                <div class="text-[10px] text-neutral-400">ГЛУБИНА</div>
+                <div id="miniDimD" class="font-semibold text-[#111111]">84 см</div>
+              </div>
+              <div>
+                <div class="text-[10px] text-neutral-400">ВЫСОТА</div>
+                <div id="miniDimH" class="font-semibold text-[#111111]">76 см</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. ДОПОЛНИТЕЛЬНЫЕ ОПЦИИ (4 ЧЕКБОКСА) -->
+          <div id="extraOptionsSection" class="space-y-2">
+            <div class="text-xs font-semibold text-[#111111]">4. Дополнительные опции</div>
+            <div class="space-y-1.5">
+              <label class="flex items-center justify-between p-2.5 rounded-lg border border-[#E5E5E5] hover:border-neutral-400 bg-white cursor-pointer transition-colors">
+                <span class="flex items-center gap-2.5 text-xs text-[#111111]">
+                  <input type="checkbox" data-opt-name="Пуф-оттоманка в тон" data-opt-price="19500" class="extra-opt-cb w-4 h-4 accent-[#111111] rounded" />
+                  <span>Пуф-оттоманка в тон</span>
+                </span>
+                <span class="font-mono text-xs text-neutral-600 tabular">+19 500 ₽</span>
+              </label>
+
+              <label class="flex items-center justify-between p-2.5 rounded-lg border border-[#E5E5E5] hover:border-neutral-400 bg-white cursor-pointer transition-colors">
+                <span class="flex items-center gap-2.5 text-xs text-[#111111]">
+                  <input type="checkbox" data-opt-name="Поясничная подушка" data-opt-price="4200" class="extra-opt-cb w-4 h-4 accent-[#111111] rounded" />
+                  <span>Поясничная подушка из того же материала</span>
+                </span>
+                <span class="font-mono text-xs text-neutral-600 tabular">+4 200 ₽</span>
+              </label>
+
+              <label class="flex items-center justify-between p-2.5 rounded-lg border border-[#E5E5E5] hover:border-neutral-400 bg-white cursor-pointer transition-colors">
+                <span class="flex items-center gap-2.5 text-xs text-[#111111]">
+                  <input type="checkbox" data-opt-name="Водоотталкивающая пропитка" data-opt-price="2500" class="extra-opt-cb w-4 h-4 accent-[#111111] rounded" />
+                  <span>Защитная водоотталкивающая пропитка</span>
+                </span>
+                <span class="font-mono text-xs text-neutral-600 tabular">+2 500 ₽</span>
+              </label>
+
+              <label class="flex items-center justify-between p-2.5 rounded-lg border border-[#E5E5E5] hover:border-neutral-400 bg-white cursor-pointer transition-colors">
+                <span class="flex items-center gap-2.5 text-xs text-[#111111]">
+                  <input type="checkbox" data-opt-name="Гарантия 5 лет" data-opt-price="3900" class="extra-opt-cb w-4 h-4 accent-[#111111] rounded" />
+                  <span>Расширенная гарантия 5 лет</span>
+                </span>
+                <span class="font-mono text-xs text-neutral-600 tabular">+3 900 ₽</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 6. ШКАЛА ПРОГРЕССА БЕСПЛАТНОЙ ДОСТАВКИ И СБОРКИ -->
+          <div id="freeShippingBlock" class="p-3.5 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-[#16A34A] font-medium">✓ Бесплатная доставка и распаковка активированы</span>
+              <span class="font-mono text-[11px] text-[#16A34A] font-semibold">100%</span>
+            </div>
+            <div class="w-full h-1.5 bg-[#E5E5E5] rounded-full overflow-hidden">
+              <div class="h-full bg-[#16A34A] rounded-full w-full transition-all duration-500"></div>
+            </div>
+          </div>
+
+          <!-- 7. БЛОК КНОПОК ПОКУПКИ: КОЛИЧЕСТВО + В КОРЗИНУ + ИЗБРАННОЕ + 1 КЛИК -->
+          <div class="space-y-2.5 pt-1">
+            <div class="flex items-stretch gap-2.5">
+              <!-- Счетчик количества -->
+              <div class="ui-control flex items-center border border-[#E5E5E5] bg-white w-28 shrink-0 font-mono">
+                <button type="button" id="qtyDecBtn" aria-label="Уменьшить количество" class="w-9 h-12 flex items-center justify-center text-base hover:bg-[#FAFAFA] transition-colors">−</button>
+                <span id="qtyValueLabel" class="flex-1 text-center text-sm font-semibold tabular select-none">1</span>
+                <button type="button" id="qtyIncBtn" aria-label="Увеличить количество" class="w-9 h-12 flex items-center justify-center text-base hover:bg-[#FAFAFA] transition-colors">+</button>
+              </div>
+
+              <!-- Главная кнопка Добавить в корзину -->
+              <button
+                type="button"
+                id="addToCartBtn"
+                class="btn-accent-dynamic ui-control flex-1 h-12 px-5 border text-white text-xs sm:text-sm font-medium flex items-center justify-center gap-2"
+              >
+                <span id="addToCartText">Добавить в корзину</span>
+                <span id="addToCartPrice" class="font-mono text-xs opacity-80 tabular">· 89 000 ₽</span>
+              </button>
+
+              <!-- Кнопка В избранное -->
+              <button
+                type="button"
+                id="cardWishBtn"
+                aria-label="Добавить в избранное"
+                class="ui-control w-12 h-12 border border-[#E5E5E5] hover:border-[#111111] bg-white flex items-center justify-center shrink-0"
+              >
+                <svg id="cardWishSvg" class="w-5 h-5 text-[#111111] transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Кнопка Купить в 1 клик -->
+            <button
+              type="button"
+              id="oneClickBtn"
+              class="ui-control w-full py-3 border border-[#E5E5E5] hover:border-[#111111] bg-white text-xs font-medium text-[#111111]"
+            >
+              Купить в 1 клик
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 4. СЕКЦИЯ «СОБЕРИТЕ КОМПЛЕКТ / ДОПОЛНИТЬ ИНТЕРЬЕР» ==================== -->
+    <section id="companionSection" class="mt-20 pt-14 border-t border-[#E5E5E5]">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-8">
+        <div>
+          <span class="font-mono text-[11px] uppercase tracking-widest text-neutral-400">Соберите комплект</span>
+          <h2 class="font-display text-xl sm:text-2xl font-bold text-[#111111] mt-1">Дополнить интерьер</h2>
+        </div>
+        <p class="text-xs text-neutral-500">Предметы из коллекции NORDIC FORM, согласованные по высоте и материалам</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Товар 1: Пуф -->
+        <article class="ui-card bg-white p-4 flex flex-col justify-between group">
+          <div>
+            <div class="aspect-[4/3] rounded-lg overflow-hidden bg-[#F5F5F4] mb-3.5">
+              <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=80" alt="Пуф AERO Ottoman" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div class="flex items-center justify-between font-mono text-[10px]">
+              <span class="text-neutral-400">NF-OTT-04</span>
+              <span class="text-[#16A34A] font-medium">● В наличии</span>
+            </div>
+            <h3 class="font-display font-semibold text-sm text-[#111111] mt-1">Пуф AERO Ottoman</h3>
+            <p class="text-xs text-neutral-500 mt-1">Продолжение геометрии сиденья кресла.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-[#E5E5E5] flex items-center justify-between">
+            <span class="font-mono text-sm font-semibold tabular">19 500 ₽</span>
+            <button type="button" data-c-id="comp-ottoman" data-c-name="Пуф AERO Ottoman" data-c-meta="В тон кресла" data-c-price="19500" class="companion-btn px-3 py-1.5 rounded-lg border border-[#E5E5E5] hover:border-[#111111] text-xs font-medium transition-colors">
+              + В корзину
+            </button>
+          </div>
+        </article>
+
+        <!-- Товар 2: Торшер -->
+        <article class="ui-card bg-white p-4 flex flex-col justify-between group">
+          <div>
+            <div class="aspect-[4/3] rounded-lg overflow-hidden bg-[#F5F5F4] mb-3.5">
+              <img src="https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=600&q=80" alt="Торшер KOBE" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div class="flex items-center justify-between font-mono text-[10px]">
+              <span class="text-neutral-400">NF-LMP-09</span>
+              <span class="px-1.5 py-0.5 rounded bg-[#DC2626] text-white font-semibold">-15%</span>
+            </div>
+            <h3 class="font-display font-semibold text-sm text-[#111111] mt-1">Торшер KOBE Paper</h3>
+            <p class="text-xs text-neutral-500 mt-1">Рассеянный теплый свет 2700K с диммером.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-[#E5E5E5] flex items-center justify-between">
+            <div>
+              <span class="font-mono text-sm font-semibold tabular">24 500 ₽</span>
+              <span class="font-mono text-[11px] text-neutral-400 line-through ml-1">28 900</span>
+            </div>
+            <button type="button" data-c-id="comp-lamp" data-c-name="Торшер KOBE Paper" data-c-meta="Свет 2700K" data-c-price="24500" class="companion-btn px-3 py-1.5 rounded-lg border border-[#E5E5E5] hover:border-[#111111] text-xs font-medium transition-colors">
+              + В корзину
+            </button>
+          </div>
+        </article>
+
+        <!-- Товар 3: Приставной столик -->
+        <article class="ui-card bg-white p-4 flex flex-col justify-between group">
+          <div>
+            <div class="aspect-[4/3] rounded-lg overflow-hidden bg-[#F5F5F4] mb-3.5">
+              <img src="https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?auto=format&fit=crop&w=600&q=80" alt="Столик SORA Oak" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div class="flex items-center justify-between font-mono text-[10px]">
+              <span class="text-neutral-400">NF-TBL-02</span>
+              <span class="text-[#16A34A] font-medium">● В наличии</span>
+            </div>
+            <h3 class="font-display font-semibold text-sm text-[#111111] mt-1">Столик SORA Side Table</h3>
+            <p class="text-xs text-neutral-500 mt-1">Массив дуба, высота 48 см под уровень подлокотника.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-[#E5E5E5] flex items-center justify-between">
+            <span class="font-mono text-sm font-semibold tabular">21 000 ₽</span>
+            <button type="button" data-c-id="comp-table" data-c-name="Столик SORA Side Table" data-c-meta="Массив дуба" data-c-price="21000" class="companion-btn px-3 py-1.5 rounded-lg border border-[#E5E5E5] hover:border-[#111111] text-xs font-medium transition-colors">
+              + В корзину
+            </button>
+          </div>
+        </article>
+
+        <!-- Товар 4: Плед из мериноса -->
+        <article class="ui-card bg-white p-4 flex flex-col justify-between group">
+          <div>
+            <div class="aspect-[4/3] rounded-lg overflow-hidden bg-[#F5F5F4] mb-3.5">
+              <img src="https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?auto=format&fit=crop&w=600&q=80" alt="Плед KYOTO Merino" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div class="flex items-center justify-between font-mono text-[10px]">
+              <span class="text-neutral-400">NF-TXT-07</span>
+              <span class="text-[#16A34A] font-medium">● В наличии</span>
+            </div>
+            <h3 class="font-display font-semibold text-sm text-[#111111] mt-1">Плед KYOTO Merino 140×200</h3>
+            <p class="text-xs text-neutral-500 mt-1">100% тонкорунная шерсть мериноса, ручная бахрома.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-[#E5E5E5] flex items-center justify-between">
+            <span class="font-mono text-sm font-semibold tabular">12 900 ₽</span>
+            <button type="button" data-c-id="comp-throw" data-c-name="Плед KYOTO Merino" data-c-meta="140×200 см" data-c-price="12900" class="companion-btn px-3 py-1.5 rounded-lg border border-[#E5E5E5] hover:border-[#111111] text-xs font-medium transition-colors">
+              + В корзину
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== 5. ПЛАВАЮЩАЯ НИЖНЯЯ ПАНЕЛЬ БЫСТРОГО ЗАКАЗА ==================== -->
+  <div id="stickyBottomBar" class="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#E5E5E5] transform translate-y-full transition-transform duration-300 ease-out">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 h-14 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <span class="w-2 h-2 rounded-full bg-[#16A34A] shrink-0"></span>
+        <span class="font-display font-semibold text-xs sm:text-sm text-[#111111] truncate">{{ heading_title }}</span>
+        <span id="stickySummaryText" class="hidden md:inline text-xs text-neutral-500 truncate">· Буклее Айвори · Беленый дуб · Standard</span>
+      </div>
+      <div class="flex items-center gap-3 sm:gap-4 shrink-0">
+        <span id="stickyPriceText" class="font-mono text-sm sm:text-base font-semibold text-[#111111] tabular">89 000 ₽</span>
+        <button type="button" id="stickyAddBtn" class="btn-accent-dynamic px-4 sm:px-5 py-2 rounded-lg border text-white text-xs font-medium">
+          В корзину
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 6. ВЫДВИЖНАЯ ПАНЕЛЬ НАСТРОЕК ИНТЕРФЕЙСА (CUSTOMIZER DRAWER) ==================== -->
+  <div id="customizerBackdrop" class="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px] opacity-0 pointer-events-none transition-opacity duration-300">
+    <aside id="customizerPanel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white border-l border-[#E5E5E5] transform translate-x-full transition-transform duration-300 ease-out flex flex-col">
+      
+      <!-- Шапка панели настроек -->
+      <div class="px-6 py-4 border-b border-[#E5E5E5] flex items-center justify-between bg-[#FAFAFA]">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2 h-2 rounded-full bg-[#16A34A]"></span>
+          <h2 class="font-display font-semibold text-sm text-[#111111]">Настройки интерфейса</h2>
+          <span id="panelChangesCounter" class="px-2 py-0.5 rounded-full bg-[#111111] text-white font-mono text-[10px] tabular">0 изм.</span>
+        </div>
+        <button type="button" id="closeCustomizerBtn" class="w-8 h-8 rounded-full bg-white border border-[#E5E5E5] hover:border-[#111111] flex items-center justify-center text-xs transition-colors">✕</button>
+      </div>
+
+      <!-- Вкладки панели настроек -->
+      <div class="grid grid-cols-3 border-b border-[#E5E5E5] bg-white font-mono text-xs">
+        <button type="button" data-ctab="appearance" class="cust-tab-btn py-3 border-b-2 border-[#111111] font-semibold text-[#111111] transition-colors">
+          Внешний вид
+        </button>
+        <button type="button" data-ctab="blocks" class="cust-tab-btn py-3 border-b-2 border-transparent text-neutral-500 hover:text-[#111111] transition-colors">
+          Блоки и опции
+        </button>
+        <button type="button" data-ctab="card" class="cust-tab-btn py-3 border-b-2 border-transparent text-neutral-500 hover:text-[#111111] transition-colors">
+          Карточка
+        </button>
+      </div>
+
+      <!-- Содержимое вкладок настроек -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        
+        <!-- ВКЛАДКА 1: ВНЕШНИЙ ВИД -->
+        <div id="cust-pane-appearance" class="cust-pane space-y-6">
+          <!-- 1. Варианты галереи -->
+          <div class="space-y-2.5">
+            <label class="block text-xs font-semibold text-[#111111]">1. Раскладка галереи товара</label>
+            <div class="space-y-2">
+              <button type="button" data-gallery-mode="grid" class="cfg-gallery-btn w-full p-3 rounded-xl border border-[#111111] bg-[#FAFAFA] text-left flex items-center justify-between text-xs">
+                <div>
+                  <div class="font-medium text-[#111111]">Сетка с вертикальным скроллом</div>
+                  <div class="text-[11px] text-neutral-500">Крупные кадры в стиле лукбука</div>
+                </div>
+                <span class="w-2 h-2 rounded-full bg-[#16A34A]"></span>
+              </button>
+
+              <button type="button" data-gallery-mode="slider-left" class="cfg-gallery-btn w-full p-3 rounded-xl border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left flex items-center justify-between text-xs">
+                <div>
+                  <div class="font-medium text-[#111111]">Слайдер с миниатюрами слева</div>
+                  <div class="text-[11px] text-neutral-500">Классическая галерея с вертикальной лентой</div>
+                </div>
+                <span class="w-2 h-2 rounded-full bg-transparent"></span>
+              </button>
+
+              <button type="button" data-gallery-mode="slider-bottom" class="cfg-gallery-btn w-full p-3 rounded-xl border border-[#E5E5E5] hover:border-neutral-400 bg-white text-left flex items-center justify-between text-xs">
+                <div>
+                  <div class="font-medium text-[#111111]">Слайдер с миниатюрами снизу</div>
+                  <div class="text-[11px] text-neutral-500">Компактный режим с горизонтальной лентой</div>
+                </div>
+                <span class="w-2 h-2 rounded-full bg-transparent"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Скругление углов -->
+          <div class="space-y-2.5">
+            <label class="block text-xs font-semibold text-[#111111]">2. Скругление углов блоков</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" data-radius="0" class="cfg-radius-btn p-2.5 rounded-lg border border-[#E5E5E5] bg-white text-xs font-mono text-center">
+                Острые 0px
+              </button>
+              <button type="button" data-radius="8" class="cfg-radius-btn p-2.5 rounded-lg border border-[#E5E5E5] bg-white text-xs font-mono text-center">
+                Мягкие 8px
+              </button>
+              <button type="button" data-radius="14" class="cfg-radius-btn p-2.5 rounded-lg border border-[#111111] bg-[#FAFAFA] text-xs font-mono font-semibold text-center">
+                Округлые 14px
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Плотность и границы -->
+          <div class="space-y-2.5">
+            <label class="block text-xs font-semibold text-[#111111]">3. Стиль границ и контраст</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" data-border-style="air" class="cfg-border-btn p-2.5 rounded-lg border border-[#E5E5E5] bg-white text-xs text-center">
+                Без рамок
+              </button>
+              <button type="button" data-border-style="hairline" class="cfg-border-btn p-2.5 rounded-lg border border-[#111111] bg-[#FAFAFA] text-xs font-semibold text-center">
+                Линии 1px
+              </button>
+              <button type="button" data-border-style="contrast" class="cfg-border-btn p-2.5 rounded-lg border border-[#E5E5E5] bg-white text-xs text-center">
+                Контрастный
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. Акцентный цвет главной кнопки -->
+          <div class="space-y-2.5">
+            <label class="block text-xs font-semibold text-[#111111]">4. Акцент главной кнопки</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" data-accent="#111111" data-accent-hover="#262626" class="cfg-accent-btn p-2.5 rounded-lg border border-[#111111] bg-[#FAFAFA] flex items-center justify-center gap-2 text-xs font-medium">
+                <span class="w-3.5 h-3.5 rounded-full bg-[#111111]"></span>
+                <span>Черный</span>
+              </button>
+              <button type="button" data-accent="#16A34A" data-accent-hover="#15803D" class="cfg-accent-btn p-2.5 rounded-lg border border-[#E5E5E5] bg-white flex items-center justify-center gap-2 text-xs font-medium">
+                <span class="w-3.5 h-3.5 rounded-full bg-[#16A34A]"></span>
+                <span>Зеленый</span>
+              </button>
+              <button type="button" data-accent="#DC2626" data-accent-hover="#B91C1C" class="cfg-accent-btn p-2.5 rounded-lg border border-[#E5E5E5] bg-white flex items-center justify-center gap-2 text-xs font-medium">
+                <span class="w-3.5 h-3.5 rounded-full bg-[#DC2626]"></span>
+                <span>Красный</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ВКЛАДКА 2: БЛОКИ И ОПЦИИ (TOGGLES С ЗЕЛЕНОЙ ИНДИКАЦИЕЙ) -->
+        <div id="cust-pane-blocks" class="cust-pane hidden space-y-3">
+          <div class="text-xs text-neutral-500 mb-2">Включайте и отключайте элементы карточки в реальном времени:</div>
+
+          <label class="flex items-center justify-between p-3 rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] cursor-pointer">
+            <span class="text-xs font-medium text-[#111111]">Скидка, старая цена и выгода</span>
+            <input type="checkbox" checked data-toggle-target="discount" class="sr-only cfg-toggle" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+
+          <label class="flex items-center justify-between p-3 rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] cursor-pointer">
+            <span class="text-xs font-medium text-[#111111]">Индикатор остатков и live-просмотры</span>
+            <input type="checkbox" checked data-toggle-target="urgency" class="sr-only cfg-toggle" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+
+          <label class="flex items-center justify-between p-3 rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] cursor-pointer">
+            <span class="text-xs font-medium text-[#111111]">Шкала прогресса бесплатной доставки</span>
+            <input type="checkbox" checked data-toggle-target="shipping" class="sr-only cfg-toggle" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+
+          <label class="flex items-center justify-between p-3 rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] cursor-pointer">
+            <span class="text-xs font-medium text-[#111111]">Кнопка «Купить в 1 клик»</span>
+            <input type="checkbox" checked data-toggle-target="oneclick" class="sr-only cfg-toggle" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+
+          <label class="flex items-center justify-between p-3 rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] cursor-pointer">
+            <span class="text-xs font-medium text-[#111111]">Блок рассрочки 0% (4 платежа)</span>
+            <input type="checkbox" checked data-toggle-target="installment" class="sr-only cfg-toggle" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+
+          <label class="flex items-center justify-between p-3 rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] cursor-pointer">
+            <span class="text-xs font-medium text-[#111111]">Интерактивный мини-чертеж размеров</span>
+            <input type="checkbox" checked data-toggle-target="blueprint" class="sr-only cfg-toggle" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+
+        <!-- ВКЛАДКА 3: КАРТОЧКА -->
+        <div id="cust-pane-card" class="cust-pane hidden space-y-5">
+          <div class="space-y-2.5">
+            <label class="block text-xs font-semibold text-[#111111]">Режим отображения опций карточки</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" data-density="expanded" class="cfg-density-btn p-3 rounded-xl border border-[#111111] bg-[#FAFAFA] text-left text-xs">
+                <div class="font-semibold text-[#111111]">Расширенный</div>
+                <div class="text-[11px] text-neutral-500 mt-0.5">С доп. опциями и чертежом</div>
+              </button>
+              <button type="button" data-density="compact" class="cfg-density-btn p-3 rounded-xl border border-[#E5E5E5] bg-white text-left text-xs">
+                <div class="font-semibold text-[#111111]">Компактный</div>
+                <div class="text-[11px] text-neutral-500 mt-0.5">Только базовые параметры</div>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] space-y-2 text-xs">
+            <div class="font-semibold text-[#111111]">Активные промокоды магазина</div>
+            <div class="flex items-center justify-between font-mono text-[11px]">
+              <span class="px-2 py-0.5 rounded bg-white border border-[#E5E5E5]">NORDIC10</span>
+              <span class="text-[#16A34A]">Скидка 10% в корзине</span>
+            </div>
+            <div class="flex items-center justify-between font-mono text-[11px]">
+              <span class="px-2 py-0.5 rounded bg-white border border-[#E5E5E5]">AERO15</span>
+              <span class="text-[#16A34A]">Скидка 15% в корзине</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Подвал панели настроек со сбросом -->
+      <div class="p-5 border-t border-[#E5E5E5] bg-[#FAFAFA]">
+        <button
+          type="button"
+          id="resetCustomizerBtn"
+          class="w-full py-3 rounded-xl border border-[#E5E5E5] bg-white hover:border-[#DC2626] hover:text-[#DC2626] text-xs font-medium text-[#111111] transition-colors"
+        >
+          Сбросить настройки по умолчанию
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ==================== 7. ПОЛНОЭКРАННЫЙ ЛАЙТБОКС С НАВИГАЦИЕЙ ==================== -->
+  <div id="lightboxModal" class="fixed inset-0 z-50 bg-[#FAFAFA]/95 backdrop-blur-md hidden flex-col justify-between p-4 sm:p-8">
+    <div class="flex items-center justify-between">
+      <span id="lightboxCaption" class="text-xs font-medium text-[#111111]">01 / Архитектурный силуэт</span>
+      <div class="flex items-center gap-3">
+        <span id="lightboxCounter" class="font-mono text-xs text-neutral-400">1 / 5</span>
+        <button type="button" id="closeLightboxBtn" class="w-9 h-9 rounded-full bg-white border border-[#E5E5E5] hover:border-[#111111] flex items-center justify-center text-sm">✕</button>
+      </div>
+    </div>
+    <div class="relative flex-1 flex items-center justify-center overflow-hidden my-4">
+      <button type="button" id="lbPrevBtn" aria-label="Назад" class="absolute left-2 sm:left-6 z-10 w-10 h-10 rounded-full bg-white border border-[#E5E5E5] hover:border-[#111111] flex items-center justify-center shadow-sm">←</button>
+      <img id="lightboxImg" src="" alt="Увеличенное фото" class="max-h-[78vh] max-w-full rounded-2xl border border-[#E5E5E5] object-contain" />
+      <button type="button" id="lbNextBtn" aria-label="Вперед" class="absolute right-2 sm:right-6 z-10 w-10 h-10 rounded-full bg-white border border-[#E5E5E5] hover:border-[#111111] flex items-center justify-center shadow-sm">→</button>
+    </div>
+    <div class="text-center font-mono text-[11px] text-neutral-400">СТРЕЛКИ ← → ДЛЯ ПЕРЕКЛЮЧЕНИЯ · ESC ДЛЯ ВЫХОДА</div>
+  </div>
+
+  <!-- ==================== 8. МОДАЛКА «КУПИТЬ В 1 КЛИК» ==================== -->
+  <div id="oneClickModal" class="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px] hidden items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white border border-[#E5E5E5] rounded-2xl p-6 space-y-5 shadow-xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-display font-bold text-base text-[#111111]">Быстрый заказ в 1 клик</h3>
+        <button type="button" id="closeOneClickBtn" class="w-8 h-8 rounded-full hover:bg-[#FAFAFA] flex items-center justify-center text-neutral-500">✕</button>
+      </div>
+      <div class="p-3.5 rounded-xl bg-[#FAFAFA] border border-[#E5E5E5] text-xs space-y-1">
+        <div class="font-semibold text-[#111111]">{{ heading_title }}</div>
+        <div id="oneClickSummary" class="text-neutral-500 leading-relaxed">Буклее Айвори · Беленый дуб · Standard · 89 000 ₽</div>
+      </div>
+      <form id="oneClickForm" class="space-y-3">
+        <input type="tel" required placeholder="+7 (999) 000-00-00" class="w-full px-4 py-3 rounded-xl border border-[#E5E5E5] focus:border-[#111111] focus:outline-none text-sm font-mono" />
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-[#111111] hover:bg-[#16A34A] text-white text-xs font-medium transition-colors">
+          Подтвердить быстрый заказ
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== 9. ВЫЕЗЖАЮЩАЯ КОРЗИНА С ПРОМОКОДАМИ (NORDIC10 / AERO15) ==================== -->
+  <div id="cartDrawerBackdrop" class="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px] opacity-0 pointer-events-none transition-opacity duration-300">
+    <aside id="cartDrawerPanel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white border-l border-[#E5E5E5] transform translate-x-full transition-transform duration-300 ease-out flex flex-col">
+      
+      <div class="px-6 py-5 border-b border-[#E5E5E5] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <h2 class="font-display font-bold text-base text-[#111111]">Корзина</h2>
+          <span id="drawerCountLabel" class="font-mono text-xs text-neutral-400">(1)</span>
+        </div>
+        <button type="button" id="closeCartBtn" class="w-8 h-8 rounded-full hover:bg-[#FAFAFA] border border-[#E5E5E5] flex items-center justify-center text-xs">✕</button>
+      </div>
+
+      <div class="px-6 py-3 bg-[#FAFAFA] border-b border-[#E5E5E5] flex items-center justify-between text-xs">
+        <span class="text-[#16A34A] font-medium">✓ Бесплатная доставка и сборка</span>
+        <span class="font-mono text-neutral-400">0 ₽</span>
+      </div>
+
+      <div id="cartItemsContainer" class="flex-1 overflow-y-auto divide-y divide-[#E5E5E5] px-6"></div>
+
+      <!-- Промокод и итог -->
+      <div class="p-6 border-t border-[#E5E5E5] bg-[#FAFAFA] space-y-4">
+        <div class="flex gap-2">
+          <input
+            type="text"
+            id="cartPromoInput"
+            placeholder="Промокод (NORDIC10 или AERO15)"
+            class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-[#E5E5E5] focus:border-[#111111] focus:outline-none font-mono text-xs uppercase"
+          />
+          <button type="button" id="cartPromoApplyBtn" class="px-4 py-2.5 rounded-xl bg-white border border-[#E5E5E5] hover:border-[#111111] text-xs font-medium transition-colors">
+            Применить
+          </button>
+        </div>
+
+        <div class="space-y-1.5 text-xs">
+          <div id="cartPromoRow" class="hidden justify-between text-[#16A34A] font-medium">
+            <span id="cartPromoTitle">Скидка по промокоду</span>
+            <span id="cartPromoAmount" class="font-mono tabular">-0 ₽</span>
+          </div>
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-neutral-500">Итого к оплате</span>
+            <span id="cartTotalSum" class="font-mono text-xl font-bold text-[#111111] tabular">89 000 ₽</span>
+          </div>
+        </div>
+
+        <button type="button" id="checkoutBtn" class="w-full py-3.5 rounded-xl bg-[#111111] hover:bg-neutral-800 text-white text-sm font-medium transition-colors">
+          Оформить заказ
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ==================== 10. УВЕДОМЛЕНИЯ (TOASTS) ==================== -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ==================== JAVASCRIPT ЛОГИКА ==================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const BASE_PRICE = 89000;
+      const BASE_OLD_PRICE = 108500;
+
+      const galleryData = [
+        {
+          src: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=1400&q=85',
+          caption: '01 / Архитектурный силуэт и эргономичный наклон спинки 104°'
+        },
+        {
+          src: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1400&q=85',
+          caption: '02 / Тактильное плетение и плотность'
+        },
+        {
+          src: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&w=1400&q=85',
+          caption: '03 / Интеграция в светлый интерьер'
+        },
+        {
+          src: 'https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=1400&q=85',
+          caption: '04 / Баланс натурального дерева и мягкой геометрии'
+        },
+        {
+          src: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1400&q=85',
+          caption: '05 / Многослойный наполнитель с эффектом памяти формы'
+        }
+      ];
+
+      const state = {
+        fabric: 'Буклее Айвори',
+        fabricCategory: 'Текстиль Буклее (85 000 циклов)',
+        fabricDelta: 0,
+        fabricFilter: 'none',
+        frame: 'Беленый дуб',
+        frameDelta: 0,
+        size: 'Standard',
+        dims: { w: 78, d: 84, h: 76 },
+        sizeDelta: 0,
+        options: [],
+        qty: 1,
+        wishlisted: false,
+        promoCode: null,
+        promoPercent: 0,
+        bpUnit: 'cm',
+        activeSlide: 0,
+        lightboxIndex: 0,
+        cart: [
+          {
+            id: 'aero04-Буклее Айвори-Беленый дуб-Standard-',
+            name: 'NORDIC FORM — AERO 04',
+            meta: 'Буклее Айвори · Беленый дуб · Standard',
+            price: 89000,
+            qty: 1
+          }
+        ],
+        ui: {
+          galleryMode: 'grid',
+          radius: '14',
+          borderStyle: 'hairline',
+          accent: '#111111',
+          density: 'expanded',
+          toggles: {
+            discount: true,
+            urgency: true,
+            shipping: true,
+            oneclick: true,
+            installment: true,
+            blueprint: true
+          }
+        }
+      };
+
+      const formatRUB = (n) => n.toLocaleString('ru-RU') + ' ₽';
+
+      // Уведомления
+      const showToast = (msg, type = 'green') => {
+        const el = document.createElement('div');
+        const dot = type === 'red' ? 'bg-[#DC2626]' : 'bg-[#16A34A]';
+        el.className = 'pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[#111111] text-white text-xs shadow-lg transform translate-y-3 opacity-0 transition-all duration-300';
+        el.innerHTML = `<span class="w-2 h-2 rounded-full ${dot} shrink-0"></span><span>${msg}</span>`;
+        document.getElementById('toastContainer').appendChild(el);
+        requestAnimationFrame(() => el.classList.remove('translate-y-3', 'opacity-0'));
+        setTimeout(() => {
+          el.classList.add('translate-y-3', 'opacity-0');
+          setTimeout(() => el.remove(), 300);
+        }, 2500);
+      };
+
+      // Расчет текущей цены конфигурации
+      const getUnitPrice = () => {
+        const optsSum = state.options.reduce((s, o) => s + o.price, 0);
+        return BASE_PRICE + state.fabricDelta + state.frameDelta + state.sizeDelta + optsSum;
+      };
+
+      const getOldUnitPrice = () => {
+        const optsSum = state.options.reduce((s, o) => s + o.price, 0);
+        return BASE_OLD_PRICE + state.fabricDelta + state.frameDelta + state.sizeDelta + optsSum;
+      };
+
+      const syncAllPricesAndSummary = () => {
+        const unit = getUnitPrice();
+        const old = getOldUnitPrice();
+        const savings = old - unit;
+        const totalForQty = unit * state.qty;
+
+        document.getElementById('displayPrice').textContent = formatRUB(unit);
+        document.getElementById('displayOldPrice').textContent = formatRUB(old);
+        document.getElementById('displaySavings').textContent = `Выгода ${formatRUB(savings)}`;
+        document.getElementById('installmentValue').textContent = `4 × ${formatRUB(Math.round(unit / 4))}`;
+        document.getElementById('addToCartPrice').textContent = `· ${formatRUB(totalForQty)}`;
+        document.getElementById('stickyPriceText').textContent = formatRUB(unit);
+        document.getElementById('stickySummaryText').textContent = `· ${state.fabric} · ${state.frame} · ${state.size}`;
+
+        // Обновление вкладки характеристик
+        document.getElementById('specSizeValue').textContent = `${state.size} (${state.dims.w} × ${state.dims.d} × ${state.dims.h} см)`;
+        document.getElementById('specFabricValue').textContent = `${state.fabric} (${state.fabricCategory})`;
+        document.getElementById('specFrameValue').textContent = state.frame;
+      };
+
+      // ==================== 1. ВЫБОР ОБИВКИ (6 ВАРИАНТОВ) ====================
+      const primaryChairImage = document.getElementById('primaryChairImage');
+      const sliderActiveImg = document.getElementById('sliderActiveImg');
+
+      document.querySelectorAll('.fabric-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.fabric-btn').forEach((b) => {
+            b.classList.remove('border-[#111111]', 'bg-[#FAFAFA]');
+            b.classList.add('border-[#E5E5E5]', 'bg-white');
+          });
+          btn.classList.remove('border-[#E5E5E5]', 'bg-white');
+          btn.classList.add('border-[#111111]', 'bg-[#FAFAFA]');
+
+          state.fabric = btn.dataset.fabric;
+          state.fabricCategory = btn.dataset.categoryLabel;
+          state.fabricDelta = Number(btn.dataset.delta);
+          state.fabricFilter = btn.dataset.filter;
+
+          const deltaLabel = state.fabricDelta > 0 ? `+${formatRUB(state.fabricDelta)}` : 'База';
+          document.getElementById('selectedFabricBadge').textContent = `${state.fabric} · ${deltaLabel}`;
+          document.getElementById('photoFabricLabel').textContent = state.fabric;
+          document.getElementById('photoSwatchDot').style.backgroundColor = btn.dataset.swatch;
+
+          primaryChairImage.style.filter = state.fabricFilter;
+          sliderActiveImg.style.filter = state.fabricFilter;
+          syncAllPricesAndSummary();
+        });
+      });
+
+      // ==================== 2. ВЫБОР КАРКАСА (4 ВАРИАНТА) ====================
+      document.querySelectorAll('.frame-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.frame-btn').forEach((b) => {
+            b.classList.remove('border-[#111111]', 'bg-[#FAFAFA]');
+            b.classList.add('border-[#E5E5E5]', 'bg-white');
+          });
+          btn.classList.remove('border-[#E5E5E5]', 'bg-white');
+          btn.classList.add('border-[#111111]', 'bg-[#FAFAFA]');
+
+          state.frame = btn.dataset.frame;
+          state.frameDelta = Number(btn.dataset.delta);
+          document.getElementById('selectedFrameBadge').textContent = state.frame;
+          syncAllPricesAndSummary();
+        });
+      });
+
+      // ==================== 3. ВЫБОР РАЗМЕРА И ПЕРЕСЧЕТ ЧЕРТЕЖА ====================
+      const updateDimensionsUI = () => {
+        const mult = state.bpUnit === 'mm' ? 10 : 1;
+        const unitLabel = state.bpUnit === 'mm' ? 'мм' : 'см';
+
+        document.getElementById('miniDimW').textContent = `${state.dims.w} см`;
+        document.getElementById('miniDimD').textContent = `${state.dims.d} см`;
+        document.getElementById('miniDimH').textContent = `${state.dims.h} см`;
+
+        document.getElementById('bpSizeTitle').textContent = `(${state.size})`;
+        document.getElementById('svgDimW').textContent = `${state.dims.w * mult} ${unitLabel}`;
+        document.getElementById('svgDimD').textContent = `${state.dims.d * mult} ${unitLabel}`;
+        document.getElementById('svgDimH').textContent = `${state.dims.h * mult} ${unitLabel}`;
+      };
+
+      document.querySelectorAll('.size-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.size-btn').forEach((b) => {
+            b.classList.remove('border-[#111111]', 'bg-[#FAFAFA]');
+            b.classList.add('border-[#E5E5E5]', 'bg-white');
+          });
+          btn.classList.remove('border-[#E5E5E5]', 'bg-white');
+          btn.classList.add('border-[#111111]', 'bg-[#FAFAFA]');
+
+          state.size = btn.dataset.size;
+          state.sizeDelta = Number(btn.dataset.delta);
+          state.dims = {
+            w: Number(btn.dataset.w),
+            d: Number(btn.dataset.d),
+            h: Number(btn.dataset.h)
+          };
+          updateDimensionsUI();
+          syncAllPricesAndSummary();
+        });
+      });
+
+      // Переключатель см/мм на чертеже
+      const bpCmBtn = document.getElementById('bpCmBtn');
+      const bpMmBtn = document.getElementById('bpMmBtn');
+      bpCmBtn.addEventListener('click', () => {
+        state.bpUnit = 'cm';
+        bpCmBtn.classList.add('bg-[#111111]', 'text-white');
+        bpCmBtn.classList.remove('text-neutral-500');
+        bpMmBtn.classList.remove('bg-[#111111]', 'text-white');
+        bpMmBtn.classList.add('text-neutral-500');
+        updateDimensionsUI();
+      });
+      bpMmBtn.addEventListener('click', () => {
+        state.bpUnit = 'mm';
+        bpMmBtn.classList.add('bg-[#111111]', 'text-white');
+        bpMmBtn.classList.remove('text-neutral-500');
+        bpCmBtn.classList.remove('bg-[#111111]', 'text-white');
+        bpCmBtn.classList.add('text-neutral-500');
+        updateDimensionsUI();
+      });
+
+      // ==================== 4. ДОПОЛНИТЕЛЬНЫЕ ОПЦИИ (ЧЕКБОКСЫ) ====================
+      document.querySelectorAll('.extra-opt-cb').forEach((cb) => {
+        cb.addEventListener('change', () => {
+          state.options = Array.from(document.querySelectorAll('.extra-opt-cb:checked')).map((el) => ({
+            name: el.dataset.optName,
+            price: Number(el.dataset.optPrice)
+          }));
+          syncAllPricesAndSummary();
+        });
+      });
+
+      // ==================== 5. КОЛИЧЕСТВО И КОРЗИНА ====================
+      document.getElementById('qtyDecBtn').addEventListener('click', () => {
+        if (state.qty > 1) {
+          state.qty--;
+          document.getElementById('qtyValueLabel').textContent = state.qty;
+          syncAllPricesAndSummary();
         }
       });
-    }
-  }, 500);
-});
-$('#review').load('index.php?route=product/product/review&product_id={{ product_id }}');
-$('#review').on('click', '.pagination a', function(e) { e.preventDefault(); $('#review').load(this.href); });
-$('#button-review').on('click', function() {
-  $.ajax({
-    url: 'index.php?route=product/product/write&product_id={{ product_id }}',
-    type: 'post',
-    dataType: 'json',
-    data: $('#form-review').serialize(),
-    beforeSend: function() { $('#button-review').button('loading'); },
-    complete: function() { $('#button-review').button('reset'); },
-    success: function(json) {
-      $('.alert-dismissible').remove();
-      if (json['error']) { $('#review').after('<div class="alert alert-danger alert-dismissible">' + json['error'] + '</div>'); }
-      if (json['success']) {
-        $('#review').after('<div class="alert alert-success alert-dismissible">' + json['success'] + '</div>');
-        $('input[name=\'name\'], textarea[name=\'text\']').val('');
-        $('input[name=\'rating\']:checked').prop('checked', false);
-      }
-    }
-  });
-});
-$(function () {
-  if ($.fn.magnificPopup) {
-    $('.thumbnails').magnificPopup({ type:'image', delegate: 'a', gallery: { enabled: true } });
-  }
-});
-</script>
-{{ footer }}
+      document.getElementById('qtyIncBtn').addEventListener('click', () => {
+        if (state.qty < 9) {
+          state.qty++;
+          document.getElementById('qtyValueLabel').textContent = state.qty;
+          syncAllPricesAndSummary();
+        }
+      });
+
+      const cartDrawerBackdrop = document.getElementById('cartDrawerBackdrop');
+      const cartDrawerPanel = document.getElementById('cartDrawerPanel');
+      const cartItemsContainer = document.getElementById('cartItemsContainer');
+
+      const openCart = () => {
+        cartDrawerBackdrop.classList.remove('pointer-events-none', 'opacity-0');
+        cartDrawerPanel.classList.remove('translate-x-full');
+      };
+      const closeCart = () => {
+        cartDrawerBackdrop.classList.add('pointer-events-none', 'opacity-0');
+        cartDrawerPanel.classList.add('translate-x-full');
+      };
+
+      document.getElementById('openCartBtn').addEventListener('click', openCart);
+      document.getElementById('closeCartBtn').addEventListener('click', closeCart);
+      cartDrawerBackdrop.addEventListener('click', (e) => {
+        if (e.target === cartDrawerBackdrop) closeCart();
+      });
+
+      const renderCart = () => {
+        const totalQty = state.cart.reduce((s, i) => s + i.qty, 0);
+        const subtotal = state.cart.reduce((s, i) => s + i.price * i.qty, 0);
+        const discount = state.promoPercent > 0 ? Math.round(subtotal * (state.promoPercent / 100)) : 0;
+
+        document.getElementById('cartBadge').textContent = totalQty;
+        document.getElementById('drawerCountLabel').textContent = `(${totalQty})`;
+        document.getElementById('cartTotalSum').textContent = formatRUB(subtotal - discount);
+
+        const promoRow = document.getElementById('cartPromoRow');
+        if (discount > 0) {
+          promoRow.classList.remove('hidden');
+          promoRow.classList.add('flex');
+          document.getElementById('cartPromoTitle').textContent = `Промокод ${state.promoCode} (-${state.promoPercent}%)`;
+          document.getElementById('cartPromoAmount').textContent = `-${formatRUB(discount)}`;
+        } else {
+          promoRow.classList.add('hidden');
+        }
+
+        if (!state.cart.length) {
+          cartItemsContainer.innerHTML = `<div class="py-16 text-center text-xs text-neutral-400">Корзина пуста</div>`;
+          return;
+        }
+
+        cartItemsContainer.innerHTML = state.cart.map((item, idx) => `
+          <div class="py-5 flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <div class="font-display font-semibold text-sm text-[#111111]">${item.name}</div>
+              <div class="text-xs text-neutral-500 mt-0.5 leading-relaxed">${item.meta}</div>
+              <div class="mt-3 inline-flex items-center rounded-lg border border-[#E5E5E5] font-mono text-xs">
+                <button type="button" data-cdec="${idx}" class="px-2.5 py-1 hover:bg-[#FAFAFA]">−</button>
+                <span class="px-2 font-semibold">${item.qty}</span>
+                <button type="button" data-cinc="${idx}" class="px-2.5 py-1 hover:bg-[#FAFAFA]">+</button>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="font-mono text-sm font-semibold tabular">${formatRUB(item.price * item.qty)}</div>
+              <button type="button" data-cdel="${idx}" class="mt-3 text-[11px] text-neutral-400 hover:text-[#DC2626] transition-colors">Удалить</button>
+            </div>
+          </div>
+        `).join('');
+
+        cartItemsContainer.querySelectorAll('[data-cdec]').forEach((b) => b.addEventListener('click', () => {
+          const i = Number(b.dataset.cdec);
+          state.cart[i].qty > 1 ? state.cart[i].qty-- : state.cart.splice(i, 1);
+          renderCart();
+        }));
+        cartItemsContainer.querySelectorAll('[data-cinc]').forEach((b) => b.addEventListener('click', () => {
+          state.cart[Number(b.dataset.cinc)].qty++;
+          renderCart();
+        }));
+        cartItemsContainer.querySelectorAll('[data-cdel]').forEach((b) => b.addEventListener('click', () => {
+          state.cart.splice(Number(b.dataset.cdel), 1);
+          renderCart();
+        }));
+      };
+
+      const addToCart = (item) => {
+        const found = state.cart.find((x) => x.id === item.id);
+        found ? (found.qty += item.qty) : state.cart.push(item);
+        renderCart();
+      };
+
+      const addToCartBtn = document.getElementById('addToCartBtn');
+      const addToCartText = document.getElementById('addToCartText');
+
+      const handleMainAddToCart = () => {
+        var ocId = document.getElementById('oc-product-id');
+        if (ocId && ocId.value) {
+          var body = new URLSearchParams();
+          body.set('product_id', ocId.value);
+          body.set('quantity', String(state.qty));
+          fetch('index.php?route=checkout/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            body: body.toString()
+          }).then(function (r) { return r.json(); }).then(function (json) {
+            if (json && json.error && json.error.option) {
+              showToast('Выберите опции товара в карточке магазина', 'red');
+            }
+          }).catch(function () {});
+        }
+        const optNames = state.options.map((o) => o.name);
+        const metaParts = [state.fabric, state.frame, state.size, ...optNames];
+        addToCart({
+          id: `aero04-${metaParts.join('-')}`,
+          name: 'NORDIC FORM — AERO 04',
+          meta: metaParts.join(' · '),
+          price: getUnitPrice(),
+          qty: state.qty
+        });
+
+        addToCartBtn.classList.add('btn-confirmed');
+        addToCartText.textContent = 'Добавлено в корзину ✓';
+        showToast(`Добавлено в корзину (${state.qty} шт.)`, 'green');
+
+        setTimeout(() => {
+          addToCartBtn.classList.remove('btn-confirmed');
+          addToCartText.textContent = 'Добавить в корзину';
+        }, 1400);
+      };
+
+      addToCartBtn.addEventListener('click', handleMainAddToCart);
+      document.getElementById('stickyAddBtn').addEventListener('click', handleMainAddToCart);
+
+      // Промокоды в корзине (NORDIC10 / AERO15)
+      document.getElementById('cartPromoApplyBtn').addEventListener('click', () => {
+        const code = document.getElementById('cartPromoInput').value.trim().toUpperCase();
+        if (code === 'NORDIC10') {
+          state.promoCode = 'NORDIC10';
+          state.promoPercent = 10;
+          renderCart();
+          showToast('Промокод NORDIC10 применен (-10%)', 'green');
+        } else if (code === 'AERO15') {
+          state.promoCode = 'AERO15';
+          state.promoPercent = 15;
+          renderCart();
+          showToast('Промокод AERO15 применен (-15%)', 'green');
+        } else {
+          showToast('Неверный промокод (попробуйте NORDIC10 или AERO15)', 'red');
+        }
+      });
+
+      document.getElementById('checkoutBtn').addEventListener('click', () => {
+        if (!state.cart.length) return;
+        closeCart();
+        showToast('Заказ оформлен — менеджер свяжется с вами', 'green');
+      });
+
+      // Сопутствующие товары
+      document.querySelectorAll('.companion-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          addToCart({
+            id: btn.dataset.cId,
+            name: btn.dataset.cName,
+            meta: btn.dataset.cMeta,
+            price: Number(btn.dataset.cPrice),
+            qty: 1
+          });
+          const orig = btn.textContent;
+          btn.textContent = 'Добавлено ✓';
+          btn.classList.add('border-[#16A34A]', 'text-[#16A34A]');
+          showToast(`${btn.dataset.cName} добавлен в корзину`, 'green');
+          setTimeout(() => {
+            btn.textContent = orig;
+            btn.classList.remove('border-[#16A34A]', 'text-[#16A34A]');
+          }, 1200);
+        });
+      });
+
+      // ==================== 6. ИЗБРАННОЕ И КУПИТЬ В 1 КЛИК ====================
+      const toggleWishlist = () => {
+        state.wishlisted = !state.wishlisted;
+        const cardSvg = document.getElementById('cardWishSvg');
+        const headerSvg = document.getElementById('headerWishSvg');
+        const headerCount = document.getElementById('headerWishCount');
+
+        if (state.wishlisted) {
+          cardSvg.classList.add('text-[#DC2626]', 'fill-[#DC2626]', 'scale-110');
+          headerSvg.classList.add('text-[#DC2626]', 'fill-[#DC2626]');
+          headerCount.classList.remove('hidden');
+          showToast('Добавлено в избранное', 'red');
+        } else {
+          cardSvg.classList.remove('text-[#DC2626]', 'fill-[#DC2626]', 'scale-110');
+          headerSvg.classList.remove('text-[#DC2626]', 'fill-[#DC2626]');
+          headerCount.classList.add('hidden');
+          showToast('Удалено из избранного', 'red');
+        }
+      };
+      document.getElementById('cardWishBtn').addEventListener('click', toggleWishlist);
+      document.getElementById('headerWishBtn').addEventListener('click', toggleWishlist);
+
+      const oneClickModal = document.getElementById('oneClickModal');
+      document.getElementById('oneClickBtn').addEventListener('click', () => {
+        document.getElementById('oneClickSummary').textContent = `${state.fabric} · ${state.frame} · ${state.size} · ${formatRUB(getUnitPrice() * state.qty)}`;
+        oneClickModal.classList.remove('hidden');
+        oneClickModal.classList.add('flex');
+      });
+      document.getElementById('closeOneClickBtn').addEventListener('click', () => {
+        oneClickModal.classList.add('hidden');
+        oneClickModal.classList.remove('flex');
+      });
+      document.getElementById('oneClickForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        oneClickModal.classList.add('hidden');
+        oneClickModal.classList.remove('flex');
+        showToast('Заявка в 1 клик принята', 'green');
+      });
+
+      // ==================== 7. ГАЛЕРЕЯ, СЛАЙДЕР И ЛАЙТБОКС ====================
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-visible');
+            observer.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.08 });
+      document.querySelectorAll('.reveal-card').forEach((el) => observer.observe(el));
+
+      // Фильтрация ракурсов
+      document.querySelectorAll('.view-filter-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.view-filter-btn').forEach((b) => {
+            b.classList.remove('bg-[#111111]', 'text-white');
+            b.classList.add('bg-transparent', 'text-neutral-500');
+          });
+          btn.classList.remove('bg-transparent', 'text-neutral-500');
+          btn.classList.add('bg-[#111111]', 'text-white');
+
+          const view = btn.dataset.view;
+          document.querySelectorAll('.gallery-card').forEach((card) => {
+            card.classList.toggle('hidden', view !== 'all' && card.dataset.category !== view);
+          });
+        });
+      });
+
+      // Слайдер (для режимов slider-left и slider-bottom)
+      const sliderThumbsContainer = document.getElementById('sliderThumbsContainer');
+      const updateSliderView = (idx) => {
+        state.activeSlide = (idx + galleryData.length) % galleryData.length;
+        const item = galleryData[state.activeSlide];
+        sliderActiveImg.src = item.src;
+        sliderActiveImg.style.filter = state.fabricFilter;
+        document.getElementById('sliderCaption').textContent = item.caption;
+        document.getElementById('sliderCounter').textContent = `${state.activeSlide + 1} / ${galleryData.length}`;
+
+        sliderThumbsContainer.querySelectorAll('button').forEach((b, i) => {
+          b.classList.toggle('border-[#111111]', i === state.activeSlide);
+          b.classList.toggle('opacity-100', i === state.activeSlide);
+          b.classList.toggle('border-[#E5E5E5]', i !== state.activeSlide);
+          b.classList.toggle('opacity-60', i !== state.activeSlide);
+        });
+      };
+
+      sliderThumbsContainer.innerHTML = galleryData.map((g, i) => `
+        <button type="button" data-sidx="${i}" class="w-16 h-16 rounded-lg border ${i === 0 ? 'border-[#111111] opacity-100' : 'border-[#E5E5E5] opacity-60'} overflow-hidden bg-[#F5F5F4] transition-all shrink-0">
+          <img src="${g.src}" alt="Миниатюра ${i + 1}" class="w-full h-full object-cover" />
+        </button>
+      `).join('');
+
+      sliderThumbsContainer.querySelectorAll('button').forEach((b) => {
+        b.addEventListener('click', () => updateSliderView(Number(b.dataset.sidx)));
+      });
+      document.getElementById('sliderPrevBtn').addEventListener('click', () => updateSliderView(state.activeSlide - 1));
+      document.getElementById('sliderNextBtn').addEventListener('click', () => updateSliderView(state.activeSlide + 1));
+
+      // Лайтбокс
+      const lightboxModal = document.getElementById('lightboxModal');
+      const openLightbox = (index) => {
+        state.lightboxIndex = (index + galleryData.length) % galleryData.length;
+        const item = galleryData[state.lightboxIndex];
+        const lbImg = document.getElementById('lightboxImg');
+        lbImg.src = item.src;
+        lbImg.style.filter = state.fabricFilter;
+        document.getElementById('lightboxCaption').textContent = item.caption;
+        document.getElementById('lightboxCounter').textContent = `${state.lightboxIndex + 1} / ${galleryData.length}`;
+        lightboxModal.classList.remove('hidden');
+        lightboxModal.classList.add('flex');
+      };
+
+      document.querySelectorAll('.gallery-frame').forEach((frame) => {
+        frame.addEventListener('click', () => openLightbox(Number(frame.dataset.index || 0)));
+      });
+      document.getElementById('sliderMainStage').addEventListener('click', (e) => {
+        if (e.target.closest('button')) return;
+        openLightbox(state.activeSlide);
+      });
+      document.getElementById('lbPrevBtn').addEventListener('click', () => openLightbox(state.lightboxIndex - 1));
+      document.getElementById('lbNextBtn').addEventListener('click', () => openLightbox(state.lightboxIndex + 1));
+      document.getElementById('closeLightboxBtn').addEventListener('click', () => {
+        lightboxModal.classList.add('hidden');
+        lightboxModal.classList.remove('flex');
+      });
+      document.addEventListener('keydown', (e) => {
+        if (lightboxModal.classList.contains('hidden')) return;
+        if (e.key === 'Escape') {
+          lightboxModal.classList.add('hidden');
+          lightboxModal.classList.remove('flex');
+        } else if (e.key === 'ArrowLeft') {
+          openLightbox(state.lightboxIndex - 1);
+        } else if (e.key === 'ArrowRight') {
+          openLightbox(state.lightboxIndex + 1);
+        }
+      });
+
+      // ==================== 8. ВКЛАДКИ ПОД ГАЛЕРЕЕЙ И ОТЗЫВЫ ====================
+      const activateDetailTab = (tabName) => {
+        document.querySelectorAll('.detail-tab-btn').forEach((b) => {
+          const active = b.dataset.tab === tabName;
+          b.classList.toggle('border-[#111111]', active);
+          b.classList.toggle('text-[#111111]', active);
+          b.classList.toggle('border-transparent', !active);
+          b.classList.toggle('text-neutral-500', !active);
+        });
+        document.querySelectorAll('.detail-pane').forEach((p) => {
+          if (p.id === `pane-${tabName}`) {
+            p.classList.remove('hidden');
+            p.classList.add('tab-pane-active');
+          } else {
+            p.classList.add('hidden');
+          }
+        });
+      };
+
+      document.querySelectorAll('.detail-tab-btn').forEach((btn) => {
+        btn.addEventListener('click', () => activateDetailTab(btn.dataset.tab));
+      });
+      document.getElementById('jumpToBlueprintBtn').addEventListener('click', () => {
+        activateDetailTab('blueprint');
+        document.getElementById('detailsTabsSection').scrollIntoView({ behavior: 'smooth' });
+      });
+
+      let reviewCount = 24;
+      document.getElementById('reviewSubmitForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const author = document.getElementById('revAuthorInput').value.trim();
+        const rating = document.getElementById('revRatingInput').value;
+        const text = document.getElementById('revTextInput').value.trim();
+        if (!author || !text) return;
+
+        const art = document.createElement('article');
+        art.className = 'p-4 rounded-xl bg-[#FAFAFA] border border-[#16A34A] space-y-2 tab-pane-active';
+        art.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-[#111111]">${author}</span>
+              <span class="px-2 py-0.5 rounded-full bg-[#16A34A]/10 text-[#16A34A] text-[10px] font-medium">✓ Новый отзыв</span>
+            </div>
+            <span class="font-mono text-[11px] text-neutral-400">Только что</span>
+          </div>
+          <div class="text-xs text-neutral-500">${rating} · ${state.fabric} · ${state.frame}</div>
+          <p class="text-xs text-neutral-700 leading-relaxed">${text}</p>
+        `;
+        document.getElementById('reviewsList').prepend(art);
+        reviewCount++;
+        document.getElementById('tabReviewsCounter').textContent = reviewCount;
+        e.target.reset();
+        showToast('Отзыв опубликован', 'green');
+      });
+
+      // ==================== 9. ПОИСК ПО КАТАЛОГУ В ШАПКЕ ====================
+      const searchCatalog = [
+        { title: 'Лаунж-кресло AERO 04', cat: 'Текущий товар', price: '89 000 ₽', anchor: '#' },
+        { title: 'Пуф-оттоманка AERO Ottoman', cat: 'Комплект', price: '19 500 ₽', anchor: '#companionSection' },
+        { title: 'Торшер KOBE Paper & Steel', cat: 'Освещение', price: '24 500 ₽', anchor: '#companionSection' },
+        { title: 'Приставной столик SORA Oak', cat: 'Столы', price: '21 000 ₽', anchor: '#companionSection' },
+        { title: 'Плед KYOTO Merino 140×200', cat: 'Текстиль', price: '12 900 ₽', anchor: '#companionSection' }
+      ];
+      const searchInput = document.getElementById('catalogSearchInput');
+      const searchDropdown = document.getElementById('searchDropdown');
+
+      searchInput.addEventListener('input', () => {
+        const q = searchInput.value.trim().toLowerCase();
+        if (!q) {
+          searchDropdown.classList.add('hidden');
+          return;
+        }
+        const matches = searchCatalog.filter((x) => x.title.toLowerCase().includes(q) || x.cat.toLowerCase().includes(q));
+        if (!matches.length) {
+          searchDropdown.innerHTML = `<div class="p-3 text-xs text-neutral-400">Ничего не найдено</div>`;
+        } else {
+          searchDropdown.innerHTML = matches.map((m) => `
+            <a href="${m.anchor}" class="flex items-center justify-between px-3.5 py-2.5 hover:bg-[#FAFAFA] border-b last:border-b-0 border-[#E5E5E5] text-xs">
+              <div>
+                <div class="font-medium text-[#111111]">${m.title}</div>
+                <div class="text-[10px] text-neutral-400">${m.cat}</div>
+              </div>
+              <span class="font-mono font-semibold text-[#111111]">${m.price}</span>
+            </a>
+          `).join('');
+        }
+        searchDropdown.classList.remove('hidden');
+      });
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#catalogSearchInput') && !e.target.closest('#searchDropdown')) {
+          searchDropdown.classList.add('hidden');
+        }
+      });
+
+      // ==================== 10. ПАНЕЛЬ НАСТРОЕК ИНТЕРФЕЙСА (CUSTOMIZER) ====================
+      const customizerBackdrop = document.getElementById('customizerBackdrop');
+      const customizerPanel = document.getElementById('customizerPanel');
+
+      document.getElementById('openCustomizerBtn').addEventListener('click', () => {
+        customizerBackdrop.classList.remove('pointer-events-none', 'opacity-0');
+        customizerPanel.classList.remove('translate-x-full');
+      });
+      const closeCustomizer = () => {
+        customizerBackdrop.classList.add('pointer-events-none', 'opacity-0');
+        customizerPanel.classList.add('translate-x-full');
+      };
+      document.getElementById('closeCustomizerBtn').addEventListener('click', closeCustomizer);
+      customizerBackdrop.addEventListener('click', (e) => {
+        if (e.target === customizerBackdrop) closeCustomizer();
+      });
+
+      // Вкладки внутри панели настроек
+      document.querySelectorAll('.cust-tab-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cust-tab-btn').forEach((b) => {
+            b.classList.remove('border-[#111111]', 'font-semibold', 'text-[#111111]');
+            b.classList.add('border-transparent', 'text-neutral-500');
+          });
+          btn.classList.remove('border-transparent', 'text-neutral-500');
+          btn.classList.add('border-[#111111]', 'font-semibold', 'text-[#111111]');
+
+          document.querySelectorAll('.cust-pane').forEach((p) => {
+            p.classList.toggle('hidden', p.id !== `cust-pane-${btn.dataset.ctab}`);
+          });
+        });
+      });
+
+      // Применение всех настроек в реальном времени и подсчет изменений
+      const applyCustomizerState = () => {
+        let changes = 0;
+        if (state.ui.galleryMode !== 'grid') changes++;
+        if (state.ui.radius !== '14') changes++;
+        if (state.ui.borderStyle !== 'hairline') changes++;
+        if (state.ui.accent !== '#111111') changes++;
+        if (state.ui.density !== 'expanded') changes++;
+        Object.values(state.ui.toggles).forEach((val) => { if (!val) changes++; });
+
+        const badge = document.getElementById('customizerChangedBadge');
+        document.getElementById('panelChangesCounter').textContent = `${changes} изм.`;
+        if (changes > 0) {
+          badge.textContent = changes;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+
+        // 1. Раскладка галереи
+        const gridEl = document.getElementById('galleryLayoutGrid');
+        const sliderEl = document.getElementById('galleryLayoutSlider');
+        const thumbsEl = document.getElementById('sliderThumbsContainer');
+        if (state.ui.galleryMode === 'grid') {
+          gridEl.classList.remove('hidden');
+          sliderEl.classList.add('hidden');
+          sliderEl.classList.remove('flex');
+        } else {
+          gridEl.classList.add('hidden');
+          sliderEl.classList.remove('hidden');
+          sliderEl.classList.add('flex');
+          if (state.ui.galleryMode === 'slider-left') {
+            sliderEl.classList.remove('flex-col-reverse');
+            sliderEl.classList.add('flex-col', 'sm:flex-row');
+            thumbsEl.classList.remove('flex-row', 'overflow-x-auto');
+            thumbsEl.classList.add('flex-row', 'sm:flex-col');
+          } else {
+            sliderEl.classList.remove('sm:flex-row');
+            sliderEl.classList.add('flex-col-reverse');
+            thumbsEl.classList.remove('sm:flex-col');
+            thumbsEl.classList.add('flex-row', 'overflow-x-auto');
+          }
+        }
+
+        // 2. Скругление углов
+        document.documentElement.style.setProperty('--ui-radius', `${state.ui.radius}px`);
+        document.documentElement.style.setProperty('--ui-radius-sm', `${Math.max(0, Number(state.ui.radius) - 4)}px`);
+
+        // 3. Границы
+        if (state.ui.borderStyle === 'air') {
+          document.documentElement.style.setProperty('--ui-border-color', 'transparent');
+        } else if (state.ui.borderStyle === 'contrast') {
+          document.documentElement.style.setProperty('--ui-border-color', '#111111');
+        } else {
+          document.documentElement.style.setProperty('--ui-border-color', '#E5E5E5');
+        }
+
+        // 4. Акцент главной кнопки
+        const hoverMap = { '#111111': '#262626', '#16A34A': '#15803D', '#DC2626': '#B91C1C' };
+        document.documentElement.style.setProperty('--ui-btn-accent', state.ui.accent);
+        document.documentElement.style.setProperty('--ui-btn-accent-hover', hoverMap[state.ui.accent] || '#262626');
+
+        // 5. Переключатели видимости блоков
+        document.querySelectorAll('.discount-element').forEach((el) => el.classList.toggle('hidden', !state.ui.toggles.discount));
+        document.getElementById('stockUrgencyBlock').classList.toggle('hidden', !state.ui.toggles.urgency);
+        document.getElementById('freeShippingBlock').classList.toggle('hidden', !state.ui.toggles.shipping);
+        document.getElementById('oneClickBtn').classList.toggle('hidden', !state.ui.toggles.oneclick);
+        document.getElementById('installmentBlock').classList.toggle('hidden', !state.ui.toggles.installment);
+
+        // 6. Компактный / Расширенный режим + мини-чертеж
+        const isCompact = state.ui.density === 'compact';
+        document.getElementById('extraOptionsSection').classList.toggle('hidden', isCompact);
+        document.getElementById('cardBlueprintWidget').classList.toggle('hidden', isCompact || !state.ui.toggles.blueprint);
+      };
+
+      // Слушатели кнопок настроек
+      document.querySelectorAll('.cfg-gallery-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cfg-gallery-btn').forEach((b) => {
+            b.classList.remove('border-[#111111]', 'bg-[#FAFAFA]');
+            b.classList.add('border-[#E5E5E5]', 'bg-white');
+            b.querySelector('span:last-child').classList.replace('bg-[#16A34A]', 'bg-transparent');
+          });
+          btn.classList.remove('border-[#E5E5E5]', 'bg-white');
+          btn.classList.add('border-[#111111]', 'bg-[#FAFAFA]');
+          btn.querySelector('span:last-child').classList.replace('bg-transparent', 'bg-[#16A34A]');
+          state.ui.galleryMode = btn.dataset.galleryMode;
+          applyCustomizerState();
+        });
+      });
+
+      document.querySelectorAll('.cfg-radius-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cfg-radius-btn').forEach((b) => {
+            b.classList.remove('border-[#111111]', 'bg-[#FAFAFA]', 'font-semibold');
+            b.classList.add('border-[#E5E5E5]', 'bg-white');
+          });
+          btn.classList.remove('border-[#E5E5E5]', 'bg-white');
+          btn.classList.add('border-[#111111]', 'bg-[#FAFAFA]', 'font-semibold');
+          state.ui.radius = btn.dataset.radius;
+          applyCustomizerState();
+        });
+      });
+
+      document.querySelectorAll('.cfg-border-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cfg-border-btn').forEach((b) => {
+            b.classList.remove('border-[#111111]', 'bg-[#FAFAFA]', 'font-semibold');
+            b.classList.add('border-[#E5E5E5]', 'bg-white');
+          });
+          btn.classList.remove('border-[#E5E5E5]', 'bg-white');
+          btn.classList.add('border-[#111111]', 'bg-[#FAFAFA]', 'font-semibold');
+          state.ui.borderStyle = btn.dataset.borderStyle;
+          applyCustomizerState();
+        });
+      });
+
+      document.querySelectorAll('.cfg-accent-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cfg-accent-btn').forEach((b) => {
+            b.classList.remove('border-[#111111]', 'bg-[#FAFAFA]');
+            b.classList.add('border-[#E5E5E5]', 'bg-white');
+          });
+          btn.classList.remove('border-[#E5E5E5]', 'bg-white');
+          btn.classList.add('border-[#111111]', 'bg-[#FAFAFA]');
+          state.ui.accent = btn.dataset.accent;
+          applyCustomizerState();
+        });
+      });
+
+      document.querySelectorAll('.cfg-toggle').forEach((cb) => {
+        cb.addEventListener('change', () => {
+          state.ui.toggles[cb.dataset.toggleTarget] = cb.checked;
+          applyCustomizerState();
+        });
+      });
+
+      document.querySelectorAll('.cfg-density-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cfg-density-btn').forEach((b) => {
+            b.classList.remove('border-[#111111]', 'bg-[#FAFAFA]');
+            b.classList.add('border-[#E5E5E5]', 'bg-white');
+          });
+          btn.classList.remove('border-[#E5E5E5]', 'bg-white');
+          btn.classList.add('border-[#111111]', 'bg-[#FAFAFA]');
+          state.ui.density = btn.dataset.density;
+          applyCustomizerState();
+        });
+      });
+
+      // Сброс настроек
+      document.getElementById('resetCustomizerBtn').addEventListener('click', () => {
+        state.ui = {
+          galleryMode: 'grid',
+          radius: '14',
+          borderStyle: 'hairline',
+          accent: '#111111',
+          density: 'expanded',
+          toggles: { discount: true, urgency: true, shipping: true, oneclick: true, installment: true, blueprint: true }
+        };
+        document.querySelectorAll('.cfg-toggle').forEach((cb) => { cb.checked = true; });
+        document.querySelector('.cfg-gallery-btn[data-gallery-mode="grid"]').click();
+        document.querySelector('.cfg-radius-btn[data-radius="14"]').click();
+        document.querySelector('.cfg-border-btn[data-border-style="hairline"]').click();
+        document.querySelector('.cfg-accent-btn[data-accent="#111111"]').click();
+        document.querySelector('.cfg-density-btn[data-density="expanded"]').click();
+        showToast('Настройки интерфейса сброшены', 'red');
+      });
+
+      // ==================== 11. STICKY BOTTOM BAR ПРИ СКРОЛЛЕ ====================
+      const stickyBottomBar = document.getElementById('stickyBottomBar');
+      window.addEventListener('scroll', () => {
+        const rect = addToCartBtn.getBoundingClientRect();
+        stickyBottomBar.classList.toggle('translate-y-full', rect.bottom >= 0);
+      }, { passive: true });
+
+      renderCart();
+      syncAllPricesAndSummary();
+    });
+  </script>
+</body>
+</html>

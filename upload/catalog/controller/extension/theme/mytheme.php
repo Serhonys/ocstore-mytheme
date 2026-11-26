@@ -1,5 +1,13 @@
 <?php
 class ControllerExtensionThemeMytheme extends Controller {
+	public function productBefore(&$route, &$data, &$code) {
+		if (!empty($this->request->server['HTTPS'])) {
+			$data['base'] = $this->config->get('config_ssl');
+		} else {
+			$data['base'] = $this->config->get('config_url');
+		}
+	}
+
 	public function headerBefore(&$route, &$data, &$code) {
 		$data['color_bg'] = $this->color('theme_mytheme_color_bg', '#FAFAFA');
 		$data['color_text'] = $this->color('theme_mytheme_color_text', '#111111');
